@@ -1,0 +1,1946 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SKRIPFLOW V.3</title>
+<script src="mammoth.min.js"></script>
+<script src="docx.umd.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f4f3ef;--surface:#fff;--s2:#f9f8f5;--s3:#f2f1ec;
+  --border:#e0ddd4;--border-s:#c8c5bb;
+  --text:#1a1a17;--text2:#58564f;--text3:#98958c;
+  --accent:#1a56a0;--accent-bg:#eef4fc;--accent-b:#b8d0f0;
+  --green:#1a7a4a;--green-bg:#edf7f2;--green-b:#a0d8bc;
+  --amber:#8a5a00;--amber-bg:#fdf6e3;--amber-b:#e8d08a;
+  --red:#8a2020;--red-bg:#fdf0f0;--red-b:#f0b0b0;
+  --edit:#7c3aed;--edit-bg:#f5f3ff;--edit-b:#c4b5fd;
+  --r:8px;--r2:12px;
+}
+body{font-family:Georgia,serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:15px}
+
+/* ── TOPBAR ── */
+.topbar{background:var(--surface);border-bottom:.5px solid var(--border);padding:0 28px;display:flex;align-items:center;justify-content:space-between;height:54px;position:sticky;top:0;z-index:200}
+.logo{font-size:15px;font-weight:700;letter-spacing:-.02em;display:flex;align-items:center;gap:8px}
+.logo svg{flex-shrink:0}
+.logo-accent{color:var(--accent)}
+.logo-ver{font-size:11px;font-weight:400;color:var(--text3);font-family:sans-serif;letter-spacing:0}
+.step-nav{display:flex;gap:3px;align-items:center;font-family:sans-serif}
+.stp{display:flex;align-items:center;gap:5px;padding:4px 11px;border-radius:20px;font-size:12px;color:var(--text3)}
+.stp.done{color:var(--green)}
+.stp.active{background:var(--accent-bg);color:var(--accent);font-weight:500}
+.stp-n{width:17px;height:17px;border-radius:50%;border:1.5px solid currentColor;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0}
+.stp.done .stp-n{background:var(--green);border-color:var(--green);color:#fff}
+.step-sep{color:var(--border-s);font-size:12px;margin:0 1px}
+
+/* ── LAYOUT ── */
+.main{max-width:1160px;margin:0 auto;padding:28px 20px}
+.col2{display:grid;grid-template-columns:340px 1fr;gap:20px;align-items:start}
+
+/* ── PANEL ── */
+.panel{background:var(--surface);border:.5px solid var(--border);border-radius:var(--r2);overflow:hidden}
+.ph{padding:14px 18px;border-bottom:.5px solid var(--border);display:flex;align-items:center;gap:9px}
+.ph-icon{font-size:17px;font-style:normal}
+.ph-title{font-size:13px;font-weight:700;font-family:sans-serif;letter-spacing:-.01em}
+.pb{padding:18px}
+.abar{padding:13px 18px;border-top:.5px solid var(--border);display:flex;gap:7px;justify-content:flex-end;background:var(--s2)}
+
+/* ── UPLOAD ── */
+.upzone{border:1.5px dashed var(--border-s);border-radius:var(--r2);padding:32px 18px;text-align:center;cursor:pointer;background:var(--s2);position:relative;transition:border-color .15s,background .15s}
+.upzone:hover,.upzone.drag{border-color:var(--accent);background:var(--accent-bg)}
+.upzone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.uz-ic{font-size:28px;display:block;margin-bottom:9px;font-style:normal}
+.uz-t{font-size:13px;font-weight:600;font-family:sans-serif;margin-bottom:3px}
+.uz-s{font-size:12px;color:var(--text2);font-family:sans-serif}
+.fbadge{display:inline-flex;align-items:center;gap:5px;background:var(--accent-bg);border:.5px solid var(--accent-b);color:var(--accent);border-radius:6px;padding:5px 11px;font-size:12px;font-family:sans-serif;margin-top:8px;word-break:break-all}
+
+/* ── FORM ── */
+.flabel{display:block;font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:7px;font-family:sans-serif}
+.fgroup{margin-bottom:17px}
+.fselect{width:100%;padding:8px 11px;border-radius:var(--r);border:.5px solid var(--border-s);background:var(--surface);font-size:13px;font-family:sans-serif;color:var(--text);appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='7'%3E%3Cpath d='M1 1l4.5 4.5L10 1' stroke='%2398958c' stroke-width='1.4' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:30px}
+.finput{width:100%;padding:8px 11px;border-radius:var(--r);border:.5px solid var(--border-s);background:var(--surface);font-size:13px;font-family:sans-serif;color:var(--text)}
+.finput:focus,.fselect:focus{outline:none;border-color:var(--accent)}
+.chips{display:flex;flex-wrap:wrap;gap:5px}
+.chip{padding:4px 12px;border-radius:20px;font-size:12px;font-family:sans-serif;border:.5px solid var(--border-s);background:var(--s2);color:var(--text2);cursor:pointer;transition:all .12s;user-select:none}
+.chip:hover{border-color:var(--accent);color:var(--accent)}
+.chip.on{background:var(--accent-bg);border-color:var(--accent);color:var(--accent);font-weight:500}
+.fgrid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.margin-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px}
+.mbox{background:var(--s2);border:.5px solid var(--border);border-radius:var(--r);padding:8px 10px}
+.mbox-l{font-size:10px;color:var(--text3);font-family:sans-serif;margin-bottom:2px}
+.mbox-v{font-size:13px;font-weight:600;font-family:sans-serif}
+
+/* ── BUTTONS ── */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:var(--r);font-size:13px;font-family:sans-serif;font-weight:500;cursor:pointer;border:none;transition:opacity .12s,transform .1s}
+.btn:active{transform:scale(.98)}
+.btn:disabled{opacity:.38;cursor:not-allowed}
+.btn-primary{background:var(--text);color:#fff}
+.btn-primary:hover:not(:disabled){opacity:.88}
+.btn-accent{background:var(--accent);color:#fff}
+.btn-accent:hover{opacity:.88}
+.btn-ghost{background:transparent;border:.5px solid var(--border-s);color:var(--text2)}
+.btn-ghost:hover{background:var(--s2)}
+.btn-edit{background:var(--edit-bg);border:.5px solid var(--edit-b);color:var(--edit)}
+.btn-sm{padding:6px 13px;font-size:12px}
+.btn-xs{padding:4px 10px;font-size:11px}
+
+/* ── TAB PRELIM ── */
+.tab-bar{display:flex;gap:2px;padding:10px 18px 0;border-bottom:.5px solid var(--border);background:var(--s2)}
+.tab-btn{padding:7px 14px;border-radius:var(--r) var(--r) 0 0;font-size:12px;font-family:sans-serif;font-weight:500;cursor:pointer;border:.5px solid transparent;border-bottom:none;color:var(--text3);background:transparent;transition:all .12s;position:relative;bottom:-1px}
+.tab-btn:hover{color:var(--text);background:var(--surface)}
+.tab-btn.active{background:var(--surface);border-color:var(--border);color:var(--accent);font-weight:600}
+.tab-pane{display:none;padding:18px}.tab-pane.active{display:block}
+.ftextarea{width:100%;padding:8px 11px;border-radius:var(--r);border:.5px solid var(--border-s);background:var(--surface);font-size:12px;font-family:sans-serif;color:var(--text);resize:vertical;min-height:72px;line-height:1.5}
+.ftextarea:focus{outline:none;border-color:var(--accent)}
+.field-mini{font-size:11px;color:var(--text3);font-family:sans-serif;margin-bottom:4px}
+.frow{margin-bottom:12px}
+.frow:last-child{margin-bottom:0}
+.pembimbing-block{background:var(--s2);border:.5px solid var(--border);border-radius:var(--r);padding:12px;margin-bottom:10px}
+.pembimbing-block .pb-label{font-size:11px;font-weight:600;color:var(--text2);font-family:sans-serif;margin-bottom:8px;text-transform:uppercase;letter-spacing:.04em}
+.penguji-block{background:var(--s2);border:.5px solid var(--border);border-radius:var(--r);padding:12px;margin-bottom:8px}
+.penguji-block .pq-label{font-size:11px;font-weight:600;color:var(--text2);font-family:sans-serif;margin-bottom:8px}
+.logo-upload{display:flex;align-items:center;gap:12px;padding:10px;background:var(--s2);border:.5px dashed var(--border-s);border-radius:var(--r);cursor:pointer;transition:border-color .12s}
+.logo-upload:hover{border-color:var(--accent)}
+.logo-upload input{display:none}
+.logo-preview-box{width:48px;height:48px;border-radius:6px;border:.5px solid var(--border);background:var(--surface);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0}
+.logo-preview-box img{width:100%;height:100%;object-fit:contain}
+.logo-upload-text{flex:1;font-size:12px;font-family:sans-serif;color:var(--text2)}
+.logo-upload-text strong{color:var(--text);display:block;font-size:13px;margin-bottom:2px}
+.logo-remove{font-size:11px;color:var(--text3);background:none;border:none;cursor:pointer;padding:4px 8px;border-radius:6px}
+.logo-remove:hover{color:var(--red);background:var(--red-bg)}
+.proc-list{display:flex;flex-direction:column;gap:7px}
+.pi{display:flex;align-items:flex-start;gap:11px;padding:11px 13px;border-radius:var(--r);border:.5px solid var(--border);background:var(--s2);font-family:sans-serif}
+.ps{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;font-style:normal;margin-top:1px}
+.ps.wait{background:var(--s2);border:1px solid var(--border-s);color:var(--text3)}
+.ps.run{background:var(--accent-bg);border:1px solid var(--accent-b);color:var(--accent);animation:pulse 1.2s infinite}
+.ps.ok{background:var(--green-bg);border:1px solid var(--green-b);color:var(--green)}
+.ps.err{background:var(--red-bg);border:1px solid var(--red-b);color:var(--red)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+.pi-info{flex:1}
+.pi-name{font-size:13px;font-weight:600;margin-bottom:2px}
+.pi-det{font-size:11px;color:var(--text2)}
+.ptrack{height:3px;background:var(--border);border-radius:2px;margin:14px 0 18px;overflow:hidden}
+.pfill{height:100%;background:var(--accent);border-radius:2px;transition:width .4s ease;width:0%}
+
+/* ── ALERTS ── */
+.alert{display:flex;gap:9px;align-items:flex-start;padding:11px 13px;border-radius:var(--r);font-family:sans-serif;font-size:12px;margin-bottom:10px;border:.5px solid}
+.alert-ic{font-size:14px;flex-shrink:0;font-style:normal;margin-top:1px}
+.alert.warn{background:var(--amber-bg);border-color:var(--amber-b);color:var(--amber)}
+.alert.ok{background:var(--green-bg);border-color:var(--green-b);color:var(--green)}
+.alert.err{background:var(--red-bg);border-color:var(--red-b);color:var(--red)}
+.alert.info{background:var(--accent-bg);border-color:var(--accent-b);color:var(--accent)}
+.alert.edit{background:var(--edit-bg);border-color:var(--edit-b);color:var(--edit)}
+
+/* ── SCORE CARDS ── */
+.scgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px}
+.sc{background:var(--s2);border-radius:var(--r);padding:12px;text-align:center;border:.5px solid var(--border)}
+.sc-n{font-size:24px;font-weight:700;margin-bottom:2px;font-family:sans-serif}
+.sc-n.g{color:var(--green)}.sc-n.b{color:var(--accent)}
+.sc-l{font-size:10px;color:var(--text3);font-family:sans-serif}
+
+/* ── DOWNLOAD CARDS ── */
+.dlgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
+.dlcard{border:.5px solid var(--border);border-radius:var(--r2);padding:14px 12px;text-align:center;cursor:pointer;transition:border-color .15s,background .15s;background:var(--s2)}
+.dlcard:hover{border-color:var(--accent);background:var(--accent-bg)}
+.dlcard-ic{font-size:26px;display:block;margin-bottom:7px;font-style:normal}
+.dlcard-n{font-size:12px;font-weight:600;font-family:sans-serif;margin-bottom:2px}
+.dlcard-s{font-size:11px;color:var(--text3);font-family:sans-serif}
+
+/* ── SCREENS ── */
+.screen{display:none}.screen.active{display:block}
+
+/* ════════════════════════════════════
+   EDITOR PANEL (Screen 3)
+════════════════════════════════════ */
+.editor-layout{display:grid;grid-template-columns:280px 1fr;gap:16px;align-items:start}
+
+/* Sidebar panel kiri: daftar segmen */
+.seg-list{display:flex;flex-direction:column;gap:4px}
+.seg-item{
+  display:flex;align-items:center;gap:8px;
+  padding:9px 12px;border-radius:var(--r);border:.5px solid transparent;
+  cursor:pointer;font-family:sans-serif;transition:all .12s;
+  background:var(--s2);
+}
+.seg-item:hover{border-color:var(--border-s);background:var(--surface)}
+.seg-item.active{background:var(--edit-bg);border-color:var(--edit-b)}
+.seg-ic{font-size:14px;flex-shrink:0;font-style:normal;width:20px;text-align:center}
+.seg-info{flex:1;min-width:0}
+.seg-name{font-size:12px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.seg-type{font-size:10px;color:var(--text3);margin-top:1px}
+.seg-item.active .seg-name{color:var(--edit)}
+.seg-add{display:flex;align-items:center;gap:6px;padding:7px 12px;border-radius:var(--r);border:.5px dashed var(--border-s);cursor:pointer;font-family:sans-serif;font-size:12px;color:var(--text3);background:transparent;transition:all .12s;width:100%;margin-top:6px}
+.seg-add:hover{border-color:var(--accent);color:var(--accent)}
+.seg-del{font-size:14px;color:var(--text3);background:none;border:none;cursor:pointer;padding:2px 4px;border-radius:4px;line-height:1;opacity:.5;flex-shrink:0}
+.seg-del:hover{color:var(--red);opacity:1}
+
+/* Preview panel kanan */
+.prev-wrap{background:var(--surface);border:.5px solid var(--border);border-radius:var(--r2);overflow:hidden;position:sticky;top:72px}
+.prev-bar{background:var(--s2);border-bottom:.5px solid var(--border);padding:9px 13px;display:flex;align-items:center;gap:8px}
+.prev-dots{display:flex;gap:4px}
+.prev-dot{width:8px;height:8px;border-radius:50%;background:var(--border-s)}
+.prev-label{font-size:11px;color:var(--text3);font-family:sans-serif;flex:1}
+.prev-mode-badge{font-size:10px;padding:2px 8px;border-radius:20px;background:var(--edit-bg);color:var(--edit);border:.5px solid var(--edit-b);font-family:sans-serif;font-weight:500}
+
+/* ── FLOATING TOOLBAR ── */
+#float-toolbar{
+  position:fixed;z-index:1000;
+  background:var(--text);color:#fff;
+  border-radius:var(--r);padding:6px 8px;
+  display:none;gap:4px;align-items:center;
+  box-shadow:0 4px 16px rgba(0,0,0,.25);
+  font-family:sans-serif;
+}
+#float-toolbar.visible{display:flex}
+.ft-btn{background:transparent;border:none;color:#fff;font-size:12px;padding:4px 7px;border-radius:5px;cursor:pointer;display:flex;align-items:center;gap:4px;white-space:nowrap;transition:background .12s}
+.ft-btn:hover{background:rgba(255,255,255,.15)}
+.ft-btn.active-fmt{background:rgba(255,255,255,.22)}
+.ft-sep{width:1px;height:16px;background:rgba(255,255,255,.2);margin:0 2px}
+.ft-input{background:rgba(255,255,255,.12);border:.5px solid rgba(255,255,255,.2);color:#fff;font-size:12px;padding:3px 8px;border-radius:5px;width:36px;font-family:sans-serif;text-align:center}
+.ft-input::placeholder{color:rgba(255,255,255,.45)}
+
+/* ── PREVIEW DOCUMENT ── */
+#doc-preview{
+  padding:40px 52px;max-height:calc(100vh - 160px);overflow-y:auto;
+  font-family:'Times New Roman',serif;font-size:12pt;line-height:2;
+  color:#111;background:#fff;
+}
+/* TOC */
+.toc-wrap{margin-bottom:28px}
+.toc-title-el{font-size:12pt;font-weight:bold;text-align:center;text-transform:uppercase;margin-bottom:14px;cursor:pointer;border-radius:4px;padding:2px 4px}
+.toc-row{display:flex;align-items:baseline;gap:4px;padding:2px 0;font-size:12pt;cursor:pointer;border-radius:4px;transition:background .1s}
+.toc-row:hover{background:var(--amber-bg)}
+.toc-row.editing{background:var(--edit-bg);outline:1.5px solid var(--edit-b)}
+.toc-label{flex:1}
+.toc-dots-line{flex:1;border-bottom:1px dotted #aaa;margin:0 5px;position:relative;top:-3px;min-width:20px}
+.toc-pg{min-width:28px;text-align:right}
+.toc-pg-input{width:40px;text-align:right;border:.5px solid var(--edit-b);border-radius:4px;font-family:'Times New Roman',serif;font-size:12pt;padding:0 4px;background:var(--edit-bg);color:var(--edit)}
+.toc-h1-row{font-weight:bold;text-transform:uppercase;margin-top:6px}
+.toc-h2-row{padding-left:20px}
+.toc-h3-row{padding-left:40px}
+/* Body elements */
+.doc-h1{font-size:12pt;font-weight:bold;text-align:center;text-transform:uppercase;margin:28px 0 10px;letter-spacing:.04em;cursor:pointer;border-radius:4px;padding:3px 6px;transition:background .1s;position:relative}
+.doc-h1:first-child{margin-top:0}
+.doc-h2{font-size:12pt;font-weight:bold;margin:14px 0 6px;cursor:pointer;border-radius:4px;padding:2px 5px;transition:background .1s}
+.doc-h3{font-size:12pt;font-weight:bold;font-style:italic;margin:10px 0 5px;cursor:pointer;border-radius:4px;padding:2px 5px;transition:background .1s}
+.doc-p{text-indent:1.27cm;margin-bottom:0;text-align:justify;cursor:text}
+.doc-h1:hover,.doc-h2:hover,.doc-h3:hover{background:rgba(124,58,237,.07)}
+.doc-h1.selected,.doc-h2.selected,.doc-h3.selected{background:var(--edit-bg);outline:1.5px solid var(--edit-b);border-radius:4px}
+.doc-h1[contenteditable=true],.doc-h2[contenteditable=true],.doc-h3[contenteditable=true],.doc-p[contenteditable=true]{
+  outline:2px solid var(--edit);background:var(--edit-bg);border-radius:4px;cursor:text
+}
+.doc-p:hover{background:rgba(26,86,160,.04)}
+.doc-p.selected{background:var(--accent-bg);outline:1.5px solid var(--accent-b);border-radius:4px}
+/* Nomor halaman badge */
+.pg-badge{
+  position:absolute;right:0;top:50%;transform:translateY(-50%);
+  font-size:10px;background:var(--accent-bg);color:var(--accent);
+  border:.5px solid var(--accent-b);border-radius:4px;
+  padding:1px 6px;font-family:sans-serif;font-weight:500;white-space:nowrap;
+}
+.section-divider{border:none;border-top:.5px solid var(--border);margin:20px 0}
+/* Edit mode indicator */
+.edit-indicator{
+  font-size:10px;font-family:sans-serif;padding:2px 7px;border-radius:20px;
+  background:var(--edit-bg);color:var(--edit);border:.5px solid var(--edit-b);
+  position:absolute;top:-10px;left:50%;transform:translateX(-50%);white-space:nowrap;
+  pointer-events:none;
+}
+</style>
+</head>
+<body>
+
+<!-- ══ TOPBAR ══ -->
+<header class="topbar">
+  <div class="logo">
+    <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
+      <rect x="2" y="2" width="16" height="16" rx="3" stroke="currentColor" stroke-width="1.4"/>
+      <path d="M5 7h10M5 10h7M5 13h5" stroke="#1a56a0" stroke-width="1.4" stroke-linecap="round"/>
+    </svg>
+   SKRIP<span class="logo-accent">FLOW</span>
+    <span class="logo-ver">v3</span>
+  </div>
+  <nav class="step-nav">
+    <div class="stp" id="nav-1"><span class="stp-n" id="sn1">1</span><span>Konfigurasi</span></div>
+    <span class="step-sep">›</span>
+    <div class="stp" id="nav-2"><span class="stp-n" id="sn2">2</span><span>Proses</span></div>
+    <span class="step-sep">›</span>
+    <div class="stp" id="nav-3"><span class="stp-n" id="sn3">3</span><span>Edit &amp; Unduh</span></div>
+  </nav>
+</header>
+
+<!-- ══ FLOATING TOOLBAR ══ -->
+<div id="float-toolbar">
+  <button class="ft-btn" id="ft-bold" title="Bold">𝐁</button>
+  <button class="ft-btn" id="ft-italic" title="Italic">𝐼</button>
+  <button class="ft-btn" id="ft-upper" title="UPPERCASE">AА</button>
+  <span class="ft-sep"></span>
+  <button class="ft-btn" id="ft-h1" title="Jadikan BAB (H1)">H1</button>
+  <button class="ft-btn" id="ft-h2" title="Jadikan Sub-bab (H2)">H2</button>
+  <button class="ft-btn" id="ft-h3" title="Jadikan H3">H3</button>
+  <button class="ft-btn" id="ft-p" title="Jadikan paragraf">¶</button>
+  <span class="ft-sep"></span>
+  <button class="ft-btn" id="ft-del" title="Hapus elemen" style="color:#fca5a5">🗑</button>
+</div>
+
+<!-- ══ SCREEN 1: KONFIGURASI ══ -->
+<div class="screen active" id="screen-1">
+<div class="main">
+<div class="col2">
+
+  <!-- Kolom kiri -->
+  <div>
+    <div class="panel" style="margin-bottom:14px">
+      <div class="ph"><span class="ph-icon">📄</span><span class="ph-title">Unggah dokumen</span></div>
+      <div class="pb">
+        <div class="upzone" id="drop-zone">
+          <input type="file" id="file-input" accept=".docx">
+          <i class="uz-ic">⬆</i>
+          <div class="uz-t">Klik atau seret file .docx ke sini</div>
+          <div class="uz-s">.docx (Word) · maks 50 MB</div>
+        </div>
+        <div id="file-info" style="display:none;margin-top:10px">
+          <div class="fbadge"><span>📄</span><span id="file-name-display"></span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="ph"><span class="ph-icon">⚙</span><span class="ph-title">Konfigurasi format</span></div>
+
+      <!-- Tab bar -->
+      <div class="tab-bar">
+        <button class="tab-btn active" onclick="switchTab('format',this)">Format</button>
+        <button class="tab-btn" onclick="switchTab('identitas',this)">Identitas</button>
+        <button class="tab-btn" onclick="switchTab('persetujuan',this)">Persetujuan</button>
+        <button class="tab-btn" onclick="switchTab('pengesahan',this)">Pengesahan</button>
+      </div>
+
+      <!-- TAB 1: FORMAT -->
+      <div class="tab-pane active" id="tab-format">
+        <div class="fgroup">
+          <label class="flabel" for="sel-inst">Template institusi</label>
+          <select class="fselect" id="sel-inst">
+            <option value="ui">Universitas Indonesia (2023)</option>
+            <option value="ugm">UGM Yogyakarta</option>
+            <option value="its">ITS Surabaya</option>
+            <option value="unair">Universitas Airlangga</option>
+            <option value="umum">Panduan umum skripsi</option>
+          </select>
+        </div>
+        <div class="fgroup">
+          <label class="flabel">Jenis karya</label>
+          <div class="chips" id="chips-jenis">
+            <span class="chip on" data-v="Skripsi">Skripsi S1</span>
+            <span class="chip" data-v="Tesis">Tesis S2</span>
+            <span class="chip" data-v="Disertasi">Disertasi S3</span>
+          </div>
+        </div>
+        <div class="fgrid2" style="gap:12px;margin-bottom:17px">
+          <div class="fgroup" style="margin-bottom:0">
+            <label class="flabel">Font</label>
+            <div class="chips" id="chips-font">
+              <span class="chip on" data-v="12">12pt</span>
+              <span class="chip" data-v="11">11pt</span>
+            </div>
+          </div>
+          <div class="fgroup" style="margin-bottom:0">
+            <label class="flabel">Spasi</label>
+            <div class="chips" id="chips-spasi">
+              <span class="chip" data-v="1.5">1,5</span>
+              <span class="chip on" data-v="2">2</span>
+            </div>
+          </div>
+        </div>
+        <div class="fgroup" style="margin-bottom:0">
+          <label class="flabel">Margin (cm) — <span id="inst-label">UI</span></label>
+          <div class="margin-grid" id="margin-grid">
+            <div class="mbox"><div class="mbox-l">Kiri</div><div class="mbox-v" id="m-kiri">4 cm</div></div>
+            <div class="mbox"><div class="mbox-l">Kanan</div><div class="mbox-v" id="m-kanan">3 cm</div></div>
+            <div class="mbox"><div class="mbox-l">Atas</div><div class="mbox-v" id="m-atas">3 cm</div></div>
+            <div class="mbox"><div class="mbox-l">Bawah</div><div class="mbox-v" id="m-bawah">3 cm</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 2: IDENTITAS (Cover + Judul + Orisinalitas) -->
+      <div class="tab-pane" id="tab-identitas">
+        <div class="frow">
+          <div class="field-mini">Logo institusi (untuk halaman sampul, 4×4 cm)</div>
+          <label class="logo-upload" id="logo-upload-zone">
+            <input type="file" id="logo-input" accept="image/png,image/jpeg,image/jpg">
+            <div class="logo-preview-box" id="logo-preview-box">
+              <span style="font-size:18px;color:var(--text3)">🖼</span>
+            </div>
+            <div class="logo-upload-text" id="logo-upload-text">
+              <strong>Klik untuk unggah logo</strong>
+              PNG/JPG, akan dicetak 4×4 cm
+            </div>
+            <button type="button" class="logo-remove" id="btn-logo-remove" style="display:none">Hapus</button>
+          </label>
+        </div>
+        <div class="frow">
+          <div class="field-mini">Judul karya ilmiah</div>
+          <textarea class="ftextarea" id="inp-judul" placeholder="Tulis judul lengkap karya ilmiah…" rows="3"></textarea>
+        </div>
+        <div class="fgrid2">
+          <div class="frow">
+            <div class="field-mini">Nama penulis</div>
+            <input class="finput" id="inp-penulis" type="text" placeholder="Nama lengkap…">
+          </div>
+          <div class="frow">
+            <div class="field-mini">NIM / NRP</div>
+            <input class="finput" id="inp-nim" type="text" placeholder="Nomor mahasiswa…">
+          </div>
+        </div>
+        <div class="fgrid2">
+          <div class="frow">
+            <div class="field-mini">Program studi</div>
+            <input class="finput" id="inp-prodi" type="text" placeholder="Manajemen…">
+          </div>
+          <div class="frow">
+            <div class="field-mini">Fakultas</div>
+            <input class="finput" id="inp-fakultas" type="text" placeholder="Ekonomi…">
+          </div>
+        </div>
+        <div class="fgrid2">
+          <div class="frow">
+            <div class="field-mini">Gelar yang diperoleh</div>
+            <input class="finput" id="inp-gelar" type="text" placeholder="Sarjana Manajemen (S.M.)…">
+          </div>
+          <div class="frow">
+            <div class="field-mini">Tahun</div>
+            <input class="finput" id="inp-tahun" type="text" placeholder="2024" maxlength="4">
+          </div>
+        </div>
+        <div class="frow">
+          <div class="field-mini">Tanggal pembuatan surat pernyataan</div>
+          <input class="finput" id="inp-tgl-orisinil" type="text" placeholder="15 Juni 2024">
+        </div>
+        <div class="frow" style="margin-bottom:0">
+          <div class="field-mini">Penggunaan AI (isi jika menggunakan)</div>
+          <textarea class="ftextarea" id="inp-ai-tools" placeholder="Contoh: ChatGPT untuk penyusunan draf, Grammarly untuk koreksi bahasa…" rows="2"></textarea>
+        </div>
+      </div>
+
+      <!-- TAB 3: PERSETUJUAN (Lembar Persetujuan) -->
+      <div class="tab-pane" id="tab-persetujuan">
+        <div style="font-size:11px;color:var(--text3);font-family:sans-serif;margin-bottom:12px">Data untuk <strong>Lembar Persetujuan Skripsi</strong></div>
+        <div class="pembimbing-block">
+          <div class="pb-label">Dosen Pembimbing Utama</div>
+          <div class="frow">
+            <div class="field-mini">Nama lengkap + gelar</div>
+            <input class="finput" id="inp-pb1-nama" type="text" placeholder="Dr. Nama Pembimbing, M.Si.">
+          </div>
+          <div class="frow" style="margin-bottom:0">
+            <div class="field-mini">NIDN</div>
+            <input class="finput" id="inp-pb1-nidn" type="text" placeholder="0012345678">
+          </div>
+        </div>
+        <div class="pembimbing-block">
+          <div class="pb-label">Dosen Pembimbing Anggota</div>
+          <div class="frow">
+            <div class="field-mini">Nama lengkap + gelar</div>
+            <input class="finput" id="inp-pb2-nama" type="text" placeholder="Nama Pembimbing, M.M.">
+          </div>
+          <div class="frow" style="margin-bottom:0">
+            <div class="field-mini">NIDN</div>
+            <input class="finput" id="inp-pb2-nidn" type="text" placeholder="0087654321">
+          </div>
+        </div>
+        <div class="pembimbing-block" style="margin-bottom:0">
+          <div class="pb-label">Ketua Program Studi</div>
+          <div class="frow">
+            <div class="field-mini">Nama lengkap + gelar</div>
+            <input class="finput" id="inp-kaprodi-nama" type="text" placeholder="Nama Kaprodi, M.Si.">
+          </div>
+          <div class="frow" style="margin-bottom:0">
+            <div class="field-mini">NIDN</div>
+            <input class="finput" id="inp-kaprodi-nidn" type="text" placeholder="0011223344">
+          </div>
+        </div>
+        <div class="frow" style="margin-top:12px;margin-bottom:0">
+          <div class="field-mini">Tanggal persetujuan</div>
+          <input class="finput" id="inp-tgl-setuju" type="text" placeholder="20 Juni 2024">
+        </div>
+      </div>
+
+      <!-- TAB 4: PENGESAHAN -->
+      <div class="tab-pane" id="tab-pengesahan">
+        <div style="font-size:11px;color:var(--text3);font-family:sans-serif;margin-bottom:12px">Data untuk <strong>Halaman Pengesahan Ujian Skripsi</strong></div>
+        <div class="penguji-block">
+          <div class="pq-label">Ketua Penguji</div>
+          <div class="fgrid2">
+            <div class="frow"><div class="field-mini">Nama + gelar</div><input class="finput" id="inp-pq1-nama" type="text" placeholder="Nama Penguji, M.Si."></div>
+            <div class="frow"><div class="field-mini">NIDN</div><input class="finput" id="inp-pq1-nidn" type="text" placeholder="0011223344"></div>
+          </div>
+        </div>
+        <div class="penguji-block">
+          <div class="pq-label">Anggota Penguji I</div>
+          <div class="fgrid2">
+            <div class="frow"><div class="field-mini">Nama + gelar</div><input class="finput" id="inp-pq2-nama" type="text" placeholder="Nama Penguji, M.M."></div>
+            <div class="frow"><div class="field-mini">NIDN</div><input class="finput" id="inp-pq2-nidn" type="text" placeholder="0022334455"></div>
+          </div>
+        </div>
+        <div class="penguji-block" style="margin-bottom:12px">
+          <div class="pq-label">Anggota Penguji II</div>
+          <div class="fgrid2">
+            <div class="frow"><div class="field-mini">Nama + gelar</div><input class="finput" id="inp-pq3-nama" type="text" placeholder="Nama Penguji, S.E., M.Si."></div>
+            <div class="frow"><div class="field-mini">NIDN</div><input class="finput" id="inp-pq3-nidn" type="text" placeholder="0033445566"></div>
+          </div>
+        </div>
+        <div class="fgrid2">
+          <div class="frow">
+            <div class="field-mini">Nama Dekan + gelar</div>
+            <input class="finput" id="inp-dekan-nama" type="text" placeholder="Nama Dekan, M.Si.">
+          </div>
+          <div class="frow">
+            <div class="field-mini">NIDN Dekan</div>
+            <input class="finput" id="inp-dekan-nidn" type="text" placeholder="0044556677">
+          </div>
+        </div>
+        <div class="frow" style="margin-bottom:0">
+          <div class="field-mini">Tanggal sidang</div>
+          <input class="finput" id="inp-tgl-sidang" type="text" placeholder="10 Juli 2024">
+        </div>
+      </div>
+
+      <div class="abar">
+        <button class="btn btn-primary" id="btn-proses" disabled>Proses dokumen →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Kolom kanan: panduan -->
+  <div class="panel">
+    <div class="ph"><span class="ph-icon">📋</span><span class="ph-title">Panduan penggunaan v3</span></div>
+    <div class="pb" style="display:flex;flex-direction:column;gap:18px">
+      <div>
+        <div style="display:flex;align-items:center;gap:9px;margin-bottom:7px">
+          <div style="width:26px;height:26px;border-radius:50%;background:var(--accent-bg);border:1px solid var(--accent-b);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;font-family:sans-serif;flex-shrink:0">1</div>
+          <span style="font-size:13px;font-weight:600;font-family:sans-serif">Siapkan .docx dengan Heading styles</span>
+        </div>
+        <p style="font-size:12px;color:var(--text2);font-family:sans-serif;line-height:1.6">Gunakan <strong>Heading 1</strong> untuk judul BAB, <strong>Heading 2</strong> untuk sub-bab, <strong>Heading 3</strong> untuk sub-sub-bab di Word. Ini kunci agar struktur terdeteksi otomatis.</p>
+      </div>
+      <div>
+        <div style="display:flex;align-items:center;gap:9px;margin-bottom:7px">
+          <div style="width:26px;height:26px;border-radius:50%;background:var(--accent-bg);border:1px solid var(--accent-b);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;font-family:sans-serif;flex-shrink:0">2</div>
+          <span style="font-size:13px;font-weight:600;font-family:sans-serif">Edit inline di preview (fitur baru v3)</span>
+        </div>
+        <p style="font-size:12px;color:var(--text2);font-family:sans-serif;line-height:1.6">Setelah diproses, <strong>klik langsung</strong> elemen di preview untuk mengedit. Heading bisa diubah teks, level, bold/italic, atau dihapus. Nomor halaman daftar isi bisa diedit manual. Tambah heading baru dari sidebar kiri.</p>
+      </div>
+      <div>
+        <div style="display:flex;align-items:center;gap:9px;margin-bottom:7px">
+          <div style="width:26px;height:26px;border-radius:50%;background:var(--accent-bg);border:1px solid var(--accent-b);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;font-family:sans-serif;flex-shrink:0">3</div>
+          <span style="font-size:13px;font-weight:600;font-family:sans-serif">Unduh hasil akhir</span>
+        </div>
+        <p style="font-size:12px;color:var(--text2);font-family:sans-serif;line-height:1.6">Setelah selesai edit, unduh .docx dengan nomor halaman romawi (prelim) dan arab (body), atau cetak ke PDF via browser.</p>
+      </div>
+
+      <div style="padding:13px;background:var(--edit-bg);border:.5px solid var(--edit-b);border-radius:var(--r)">
+        <div style="font-size:11px;font-weight:600;color:var(--edit);font-family:sans-serif;margin-bottom:5px">✦ Fitur baru v3</div>
+        <div style="display:flex;flex-direction:column;gap:5px">
+          <div style="font-size:12px;color:var(--edit);font-family:sans-serif">✓ Inline edit teks heading langsung di preview</div>
+          <div style="font-size:12px;color:var(--edit);font-family:sans-serif">✓ Edit nomor halaman daftar isi secara manual</div>
+          <div style="font-size:12px;color:var(--edit);font-family:sans-serif">✓ Tambah / hapus entri heading</div>
+          <div style="font-size:12px;color:var(--edit);font-family:sans-serif">✓ Toggle bold, italic, uppercase per heading</div>
+          <div style="font-size:12px;color:var(--edit);font-family:sans-serif">✓ Ganti level heading (H1→H2→H3)</div>
+          <div style="font-size:12px;color:var(--edit);font-family:sans-serif">✓ TOC sync otomatis setiap edit</div>
+        </div>
+      </div>
+      <div style="padding:13px;background:var(--amber-bg);border:.5px solid var(--amber-b);border-radius:var(--r)">
+        <div style="font-size:11px;font-weight:600;color:var(--amber);font-family:sans-serif;margin-bottom:4px">⚠ Privasi</div>
+        <p style="font-size:12px;color:var(--amber);font-family:sans-serif;line-height:1.5">Semua proses berjalan di browser. Dokumen tidak dikirim ke server manapun.</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+</div><!-- /screen-1 -->
+
+<!-- ══ SCREEN 2: PROSES ══ -->
+<div class="screen" id="screen-2">
+<div class="main" style="max-width:620px">
+  <div class="panel">
+    <div class="ph"><span class="ph-icon">⚙</span><span class="ph-title" id="proc-hl">Memproses dokumen…</span></div>
+    <div class="pb">
+      <div id="proc-file" style="font-family:sans-serif;font-size:12px;color:var(--text2);margin-bottom:12px"></div>
+      <div class="ptrack"><div class="pfill" id="pbar"></div></div>
+      <div class="proc-list">
+        <div class="pi"><span class="ps wait" id="ps0">–</span><div class="pi-info"><div class="pi-name">Membaca dokumen .docx</div><div class="pi-det" id="pd0">Menunggu…</div></div></div>
+        <div class="pi"><span class="ps wait" id="ps1">–</span><div class="pi-info"><div class="pi-name">Mendeteksi struktur heading</div><div class="pi-det" id="pd1">Menunggu…</div></div></div>
+        <div class="pi"><span class="ps wait" id="ps2">–</span><div class="pi-info"><div class="pi-name">Penomoran bab &amp; sub-bab</div><div class="pi-det" id="pd2">Menunggu…</div></div></div>
+        <div class="pi"><span class="ps wait" id="ps3">–</span><div class="pi-info"><div class="pi-name">Estimasi nomor halaman</div><div class="pi-det" id="pd3">Menunggu…</div></div></div>
+        <div class="pi"><span class="ps wait" id="ps4">–</span><div class="pi-info"><div class="pi-name">Menyiapkan editor inline</div><div class="pi-det" id="pd4">Menunggu…</div></div></div>
+      </div>
+      <div id="proc-alerts" style="margin-top:12px"></div>
+    </div>
+  </div>
+</div>
+</div><!-- /screen-2 -->
+
+<!-- ══ SCREEN 3: EDIT & UNDUH ══ -->
+<div class="screen" id="screen-3">
+<div class="main">
+
+  <!-- Stat bar -->
+  <div class="scgrid" style="margin-bottom:16px">
+    <div class="sc"><div class="sc-n g" id="st-bab">0</div><div class="sc-l">Bab</div></div>
+    <div class="sc"><div class="sc-n b" id="st-sub">0</div><div class="sc-l">Sub-bab</div></div>
+    <div class="sc"><div class="sc-n g" id="st-pg">–</div><div class="sc-l">Est. halaman</div></div>
+  </div>
+
+  <div class="editor-layout">
+
+    <!-- Panel kiri: segment list + download -->
+    <div style="display:flex;flex-direction:column;gap:14px">
+
+      <!-- Segment navigator -->
+      <div class="panel">
+        <div class="ph"><span class="ph-icon">🗂</span><span class="ph-title">Segmen dokumen</span></div>
+        <div class="pb" style="padding:12px">
+          <div class="alert edit" style="margin-bottom:10px">
+            <span class="alert-ic">✦</span>
+            <span>Klik segmen untuk scroll ke elemen. Klik elemen di preview untuk edit langsung.</span>
+          </div>
+          <div class="seg-list" id="seg-list"></div>
+          <button class="seg-add" id="btn-add-seg">＋ Tambah heading baru</button>
+        </div>
+      </div>
+
+      <!-- Download -->
+      <div class="panel">
+        <div class="ph"><span class="ph-icon">⬇</span><span class="ph-title">Unduh dokumen</span></div>
+        <div class="pb">
+          <div class="dlgrid">
+            <div class="dlcard" id="btn-dl-docx">
+              <span class="dlcard-ic">📘</span>
+              <div class="dlcard-n">Word (.docx)</div>
+              <div class="dlcard-s">Dengan page number</div>
+            </div>
+            <div class="dlcard" id="btn-dl-pdf">
+              <span class="dlcard-ic">🖨</span>
+              <div class="dlcard-n">Cetak / PDF</div>
+              <div class="dlcard-s">Ctrl+P → Save PDF</div>
+            </div>
+          </div>
+          <div class="alert info" style="margin-bottom:0;font-size:11px">
+            <span class="alert-ic">ℹ</span>
+            <span>Setelah edit selesai, klik <strong>Unduh .docx</strong> — semua perubahan tersimpan.</span>
+          </div>
+        </div>
+        <div class="abar">
+          <button class="btn btn-ghost btn-sm" id="btn-restart">← Ulang</button>
+          <button class="btn btn-edit btn-sm" id="btn-regen">↺ Sync TOC</button>
+        </div>
+      </div>
+
+    </div><!-- /left col -->
+
+    <!-- Preview editor kanan -->
+    <div class="prev-wrap">
+      <div class="prev-bar">
+        <div class="prev-dots"><div class="prev-dot"></div><div class="prev-dot"></div><div class="prev-dot"></div></div>
+        <span class="prev-label">Preview dokumen — klik elemen untuk edit inline</span>
+        <span class="prev-mode-badge">✦ Edit Mode</span>
+      </div>
+      <div id="doc-preview"></div>
+    </div>
+
+  </div>
+</div>
+</div><!-- /screen-3 -->
+
+<!-- ══ SCRIPT ══ -->
+<script>
+'use strict';
+
+// ════════════════════════════════════
+// STATE
+// ════════════════════════════════════
+const S = {
+  file: null,
+  institusi: 'ui',
+  jenis: 'Skripsi',
+  fontPt: 12,
+  spasi: 2,
+  rawHtml: '',
+  segments: [],
+  docxBlob: null,
+  meta: { judul:'', penulis:'', nim:'', tahun:'' },
+  parserInfo: { frontMatterCount:0, referenceCount:0, appendixCount:0, chapterCount:0, detectedRefs:[] },
+  logoBuffer: null,
+  logoType: null,
+};
+
+let activeSegId = null;
+
+// ════════════════════════════════════
+// MARGIN CONFIG
+// ════════════════════════════════════
+const MARGINS = {
+  ui:    {kiri:4,kanan:3,atas:3,bawah:3,label:'UI'},
+  ugm:   {kiri:4,kanan:3,atas:3,bawah:3,label:'UGM'},
+  its:   {kiri:4,kanan:3,atas:3,bawah:3,label:'ITS'},
+  unair: {kiri:4,kanan:3,atas:4,bawah:3,label:'UNAIR'},
+  umum:  {kiri:3,kanan:3,atas:3,bawah:3,label:'Umum'},
+};
+
+// ════════════════════════════════════
+// SCREEN NAV
+// ════════════════════════════════════
+function goScreen(n) {
+  document.querySelectorAll('.screen').forEach((s,i) => s.classList.toggle('active', i+1===n));
+  for (let i=1;i<=3;i++){
+    const nav=document.getElementById('nav-'+i), sn=document.getElementById('sn'+i);
+    nav.classList.remove('active','done');
+    if(i<n){nav.classList.add('done');sn.textContent='✓';}
+    else if(i===n){nav.classList.add('active');sn.textContent=String(i);}
+    else sn.textContent=String(i);
+  }
+  hideToolbar();
+}
+
+// ════════════════════════════════════
+// TAB NAVIGATION
+// ════════════════════════════════════
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  const pane = document.getElementById('tab-' + name);
+  if (pane) pane.classList.add('active');
+  if (btn) btn.classList.add('active');
+}
+
+
+function initChips(id, key) {
+  document.getElementById(id).querySelectorAll('.chip').forEach(c => {
+    c.addEventListener('click', () => {
+      document.getElementById(id).querySelectorAll('.chip').forEach(x=>x.classList.remove('on'));
+      c.classList.add('on');
+      S[key] = c.dataset.v;
+      if(key==='institusi') updateMargin();
+    });
+  });
+}
+initChips('chips-jenis','jenis');
+initChips('chips-font','fontPt');
+initChips('chips-spasi','spasi');
+
+document.getElementById('sel-inst').addEventListener('change', function(){
+  S.institusi = this.value;
+  updateMargin();
+});
+
+// ════════════════════════════════════
+// LOGO UPLOAD
+// ════════════════════════════════════
+const logoInput = document.getElementById('logo-input');
+const logoPreviewBox = document.getElementById('logo-preview-box');
+const logoUploadText = document.getElementById('logo-upload-text');
+const btnLogoRemove = document.getElementById('btn-logo-remove');
+
+logoInput.addEventListener('change', async () => {
+  const file = logoInput.files[0];
+  if (!file) return;
+  if (!file.type.startsWith('image/')) { alert('Harap pilih file gambar (PNG/JPG).'); return; }
+
+  const buf = await file.arrayBuffer();
+  S.logoBuffer = buf;
+  S.logoType = file.type.includes('png') ? 'png' : 'jpg';
+
+  const url = URL.createObjectURL(file);
+  logoPreviewBox.innerHTML = `<img src="${url}" alt="Logo institusi">`;
+  logoUploadText.innerHTML = '<strong>'+file.name+'</strong>Klik untuk ganti logo';
+  btnLogoRemove.style.display = 'inline-block';
+});
+
+btnLogoRemove.addEventListener('click', (e) => {
+  e.preventDefault(); e.stopPropagation();
+  S.logoBuffer = null; S.logoType = null;
+  logoInput.value = '';
+  logoPreviewBox.innerHTML = '<span style="font-size:18px;color:var(--text3)">🖼</span>';
+  logoUploadText.innerHTML = '<strong>Klik untuk unggah logo</strong>PNG/JPG, akan dicetak 4×4 cm';
+  btnLogoRemove.style.display = 'none';
+});
+
+
+function updateMargin(){
+  const m = MARGINS[S.institusi]||MARGINS.umum;
+  document.getElementById('m-kiri').textContent = m.kiri+' cm';
+  document.getElementById('m-kanan').textContent = m.kanan+' cm';
+  document.getElementById('m-atas').textContent = m.atas+' cm';
+  document.getElementById('m-bawah').textContent = m.bawah+' cm';
+  document.getElementById('inst-label').textContent = m.label;
+}
+updateMargin();
+
+// ════════════════════════════════════
+// UPLOAD
+// ════════════════════════════════════
+const dropZone = document.getElementById('drop-zone');
+const fileInput = document.getElementById('file-input');
+const btnProses = document.getElementById('btn-proses');
+
+function setFile(f){
+  if(!f||!f.name.endsWith('.docx')){alert('Harap pilih file .docx');return;}
+  S.file=f;
+  document.getElementById('file-name-display').textContent=f.name;
+  document.getElementById('file-info').style.display='block';
+  btnProses.disabled=false;
+  dropZone.querySelector('.uz-t').textContent='File siap diproses';
+  dropZone.querySelector('.uz-ic').textContent='✅';
+}
+fileInput.addEventListener('change',()=>{if(fileInput.files[0])setFile(fileInput.files[0]);});
+dropZone.addEventListener('dragover',e=>{e.preventDefault();dropZone.classList.add('drag');});
+dropZone.addEventListener('dragleave',()=>dropZone.classList.remove('drag'));
+dropZone.addEventListener('drop',e=>{e.preventDefault();dropZone.classList.remove('drag');if(e.dataTransfer.files[0])setFile(e.dataTransfer.files[0]);});
+
+// ════════════════════════════════════
+// PROCESS LOG HELPERS
+// ════════════════════════════════════
+function setStep(i,st,det){
+  const ps=document.getElementById('ps'+i), pd=document.getElementById('pd'+i);
+  ps.className='ps '+st;
+  ps.textContent=st==='ok'?'✓':st==='err'?'✗':st==='run'?'…':'–';
+  if(det)pd.textContent=det;
+  document.getElementById('pbar').style.width=Math.round(((i+(st==='ok'?1:0))/5)*100)+'%';
+}
+function addAlert(type,msg){
+  const d=document.createElement('div');
+  d.className='alert '+type;
+  d.innerHTML='<span class="alert-ic">'+(type==='warn'?'⚠':type==='ok'?'✓':'ℹ')+'</span><span>'+msg+'</span>';
+  document.getElementById('proc-alerts').appendChild(d);
+}
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+
+// ════════════════════════════════════
+// PARSE → SEGMENTS ARRAY
+// ════════════════════════════════════
+// ════════════════════════════════════
+// PARSER v2 — DocxParser engine
+// Port dari DocxParser.js AWC repo
+// ════════════════════════════════════
+
+const FRONT_MATTER_KW=[
+  'abstrak','abstract','kata pengantar','preface','daftar isi',
+  'table of contents','daftar tabel','daftar gambar','daftar lampiran',
+  'persembahan','dedication','motto','pernyataan orisinalitas',
+  'lembar persetujuan','pengesahan','persetujuan publikasi',
+];
+const REFERENCE_KW=['daftar pustaka','references','bibliografi','bibliography','daftar referensi'];
+const APPENDIX_KW=['lampiran','appendix','appendices'];
+const APA_RE=/^[A-ZÀ-Ž][a-zA-ZÀ-Ž\-]+[,.]?\s+[A-Z]?\.?.*?\(\d{4}\)/;
+
+function stripHtml(str){
+  return str
+    .replace(/<strong>|<\/strong>|<em>|<\/em>/gi,'')
+    .replace(/<[^>]+>/g,'')
+    .replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>')
+    .replace(/&quot;/g,'"').replace(/&nbsp;/g,' ').trim();
+}
+
+// Step 1: HTML → raw elements
+function parseElements(html){
+  const els=[];
+  const RE=/<(h[1-4]|p)(?:\s[^>]*)?>([^]*?)<\/\1>/gi;
+  let m,idx=0;
+  while((m=RE.exec(html))!==null){
+    const tag=m[1].toLowerCase();
+    const text=stripHtml(m[2]).trim();
+    if(!text)continue;
+    els.push({tag,text,index:idx++});
+  }
+  return els;
+}
+
+// Step 2: Klasifikasi zone setiap elemen
+function classifyElements(elements){
+  let zone='unknown',chapterNum=0;
+  return elements.map(el=>{
+    const low=el.text.toLowerCase().trim();
+    if(el.tag==='h1'){
+      if(REFERENCE_KW.some(k=>low.includes(k))) return{...el,zone:'reference',blockType:'reference-title'};
+      if(APPENDIX_KW.some(k=>low.includes(k)))  return{...el,zone:(zone='appendix'),blockType:'appendix-title'};
+      if(FRONT_MATTER_KW.some(k=>low.includes(k))) return{...el,zone:(zone='frontmatter'),blockType:'frontmatter-title'};
+      zone='chapter';chapterNum++;
+      return{...el,zone,blockType:'chapter-title',chapterNum};
+    }
+    if(el.tag==='h2'){
+      if(REFERENCE_KW.some(k=>low.includes(k))) return{...el,zone:(zone='reference'),blockType:'reference-title'};
+      if(APPENDIX_KW.some(k=>low.includes(k)))  return{...el,zone:(zone='appendix'),blockType:'appendix-title'};
+      if(zone==='chapter') return{...el,zone,blockType:'section',chapterNum};
+      if(FRONT_MATTER_KW.some(k=>low.includes(k))) return{...el,zone:(zone='frontmatter'),blockType:'frontmatter-title'};
+      return{...el,zone:'frontmatter',blockType:'frontmatter-subtitle'};
+    }
+    if(el.tag==='h3'){
+      if(zone==='chapter') return{...el,zone,blockType:'subsection',chapterNum};
+      return{...el,zone:'frontmatter',blockType:'frontmatter-content'};
+    }
+    // paragraf
+    if(zone==='reference'){
+      return{...el,zone,blockType:APA_RE.test(el.text)?'reference-item':'reference-other'};
+    }
+    if(zone==='chapter')    return{...el,zone,blockType:'paragraph',chapterNum};
+    if(zone==='appendix')   return{...el,zone,blockType:'appendix-content'};
+    return{...el,zone:'frontmatter',blockType:'frontmatter-content'};
+  });
+}
+
+// Step 3: Bangun segments array untuk editor
+// Tiap segment adalah unit yang bisa diedit secara inline
+function buildSegments(classified){
+  const segs=[];
+  let uid=1;
+  // Simpan info front matter, ref, appendix di state
+  S.parserInfo={
+    frontMatterCount:0,
+    referenceCount:0,
+    appendixCount:0,
+    chapterCount:0,
+    detectedRefs:[],
+  };
+  classified.forEach(el=>{
+    const id='seg-'+(uid++);
+    if(el.zone==='frontmatter'){
+      S.parserInfo.frontMatterCount++;
+      if(el.blockType==='frontmatter-title'||el.blockType==='frontmatter-subtitle'){
+        segs.push({id,type:el.tag,text:el.text,bold:true,italic:false,upper:false,pageNum:null,zone:'frontmatter'});
+      } else {
+        segs.push({id,type:'p',text:el.text,bold:false,italic:false,upper:false,pageNum:null,zone:'frontmatter'});
+      }
+    } else if(el.zone==='chapter'){
+      if(el.blockType==='chapter-title'){
+        S.parserInfo.chapterCount++;
+        segs.push({id,type:'h1',text:el.text,bold:true,italic:false,upper:true,pageNum:null,zone:'chapter',chapterNum:el.chapterNum});
+      } else if(el.blockType==='section'){
+        segs.push({id,type:'h2',text:el.text,bold:true,italic:false,upper:false,pageNum:null,zone:'chapter',chapterNum:el.chapterNum});
+      } else if(el.blockType==='subsection'){
+        segs.push({id,type:'h3',text:el.text,bold:true,italic:false,upper:false,pageNum:null,zone:'chapter',chapterNum:el.chapterNum});
+      } else {
+        segs.push({id,type:'p',text:el.text,bold:false,italic:false,upper:false,pageNum:null,zone:'chapter',chapterNum:el.chapterNum});
+      }
+    } else if(el.zone==='reference'){
+      S.parserInfo.referenceCount++;
+      if(el.blockType==='reference-item') S.parserInfo.detectedRefs.push(el.text);
+      segs.push({id,type:el.blockType==='reference-title'?'h1':'p',text:el.text,bold:el.blockType==='reference-title',italic:false,upper:false,pageNum:null,zone:'reference'});
+    } else if(el.zone==='appendix'){
+      S.parserInfo.appendixCount++;
+      segs.push({id,type:el.blockType==='appendix-title'?'h1':'p',text:el.text,bold:el.blockType==='appendix-title',italic:false,upper:false,pageNum:null,zone:'appendix'});
+    }
+  });
+  return segs;
+}
+
+// Wrapper utama — ganti htmlToSegments lama
+function htmlToSegments(html){
+  const elements=parseElements(html);
+  const classified=classifyElements(elements);
+  return buildSegments(classified);
+}
+
+// ════════════════════════════════════
+// NUMBERING
+// ════════════════════════════════════
+function toRoman(n){
+  const v=[10,'X',9,'IX',5,'V',4,'IV',1,'I'];let r='';
+  for(let i=0;i<v.length;i+=2)while(n>=v[i]){r+=v[i+1];n-=v[i];}
+  return r;
+}
+function applyNumbering(segs){
+  const c=[0,0,0];
+  return segs.map(s=>{
+    // Hanya nomori elemen dalam zone chapter
+    if(s.zone!=='chapter') return{...s,num:''};
+    if(s.type==='h1'){c[0]++;c[1]=0;c[2]=0;return {...s,num:'BAB '+toRoman(c[0])};}
+    else if(s.type==='h2'){c[1]++;c[2]=0;return {...s,num:c[0]+'.'+c[1]};}
+    else if(s.type==='h3'){c[2]++;return {...s,num:c[0]+'.'+c[1]+'.'+c[2]};}
+    return {...s,num:''};
+  });
+}
+
+// ════════════════════════════════════
+// PAGE NUMBER ESTIMATION
+// ════════════════════════════════════
+const WORDS_PER_PAGE=300;
+function estimatePages(numberedSegs){
+  let page=1;
+  const pageMap={};
+  let wordAcc=0;
+  numberedSegs.forEach((s,i)=>{
+    if(s.type==='h1'||s.type==='h2'||s.type==='h3'){
+      // flush accumulated words
+      page+=Math.ceil(wordAcc/WORDS_PER_PAGE);
+      wordAcc=0;
+      if(!s.pageNum) s.pageNum=page;
+      pageMap[s.id]=s.pageNum;
+      if(s.type==='h1') page++; // page break per bab
+    } else {
+      wordAcc+=(s.text||'').split(/\s+/).length;
+    }
+  });
+  return pageMap;
+}
+
+// ════════════════════════════════════
+// MAIN PROCESS
+// ════════════════════════════════════
+btnProses.addEventListener('click', async()=>{
+  if(!S.file)return;
+  const g = id => { const el = document.getElementById(id); return el ? el.value.trim() : ''; };
+  S.meta = {
+    judul    : g('inp-judul'),
+    penulis  : g('inp-penulis'),
+    nim      : g('inp-nim'),
+    prodi    : g('inp-prodi'),
+    fakultas : g('inp-fakultas'),
+    gelar    : g('inp-gelar'),
+    tahun    : g('inp-tahun') || String(new Date().getFullYear()),
+    tglOrisinil: g('inp-tgl-orisinil'),
+    aiTools  : g('inp-ai-tools'),
+    // Persetujuan
+    pb1Nama  : g('inp-pb1-nama'),
+    pb1Nidn  : g('inp-pb1-nidn'),
+    pb2Nama  : g('inp-pb2-nama'),
+    pb2Nidn  : g('inp-pb2-nidn'),
+    kaprodiNama : g('inp-kaprodi-nama'),
+    kaprodiNidn : g('inp-kaprodi-nidn'),
+    tglSetuju: g('inp-tgl-setuju'),
+    // Pengesahan
+    pq1Nama  : g('inp-pq1-nama'),
+    pq1Nidn  : g('inp-pq1-nidn'),
+    pq2Nama  : g('inp-pq2-nama'),
+    pq2Nidn  : g('inp-pq2-nidn'),
+    pq3Nama  : g('inp-pq3-nama'),
+    pq3Nidn  : g('inp-pq3-nidn'),
+    dekanNama: g('inp-dekan-nama'),
+    dekanNidn: g('inp-dekan-nidn'),
+    tglSidang: g('inp-tgl-sidang'),
+  };
+
+  document.getElementById('proc-alerts').innerHTML='';
+  document.getElementById('proc-file').innerHTML='File: <strong>'+S.file.name+'</strong>';
+  document.getElementById('proc-hl').textContent='Memproses dokumen…';
+  goScreen(2);
+
+  // Step 0: Baca
+  setStep(0,'run','Membaca file…');await sleep(250);
+  let htmlResult;
+  try{
+    const buf=await S.file.arrayBuffer();
+    htmlResult=await mammoth.convertToHtml({arrayBuffer:buf});
+    S.rawHtml=htmlResult.value;
+    setStep(0,'ok','Dokumen berhasil dibaca');
+  }catch(e){setStep(0,'err','Gagal: '+e.message);addAlert('err','Gagal membaca file .docx. Pastikan file tidak rusak.');return;}
+
+  // Step 1: Parse dengan engine v2
+  setStep(1,'run','Mendeteksi struktur & klasifikasi zone…');await sleep(350);
+  S.segments=htmlToSegments(S.rawHtml);
+  const h1c=S.segments.filter(s=>s.type==='h1'&&s.zone==='chapter').length;
+  const h2c=S.segments.filter(s=>s.type==='h2'&&s.zone==='chapter').length;
+  const h3c=S.segments.filter(s=>s.type==='h3'&&s.zone==='chapter').length;
+  if(h1c===0){setStep(1,'err','Tidak ada Heading 1 terdeteksi');addAlert('warn','Tidak ada heading bab (Heading 1). Pastikan judul BAB menggunakan style Heading 1 di Word.');return;}
+  let det=h1c+' bab · '+h2c+' sub-bab';
+  if(S.parserInfo.frontMatterCount>0) det+=' · '+S.parserInfo.frontMatterCount+' el. front matter';
+  if(S.parserInfo.referenceCount>0)   det+=' · '+S.parserInfo.referenceCount+' referensi';
+  setStep(1,'ok',det);
+  if(htmlResult.messages&&htmlResult.messages.length)addAlert('warn','Beberapa elemen tidak dikonversi: '+htmlResult.messages.slice(0,2).map(m=>m.message).join('; '));
+  // Warning jika tidak ada front matter (kemungkinan dokumen belum lengkap)
+  if(S.parserInfo.frontMatterCount===0) addAlert('warn','Front matter (Abstrak, Kata Pengantar, dll.) tidak terdeteksi. Pastikan heading menggunakan style Word yang benar.');
+
+  // Step 2: Numbering
+  setStep(2,'run','Menomori bab…');await sleep(250);
+  S.segments=applyNumbering(S.segments);
+  setStep(2,'ok','BAB I – BAB '+toRoman(h1c));
+
+  // Step 3: Estimasi halaman
+  setStep(3,'run','Menghitung estimasi halaman…');await sleep(300);
+  estimatePages(S.segments);
+  const maxPg=Math.max(...S.segments.filter(s=>s.pageNum).map(s=>s.pageNum),1);
+  setStep(3,'ok','Estimasi ~'+maxPg+' halaman body');
+
+  // Step 4: Siapkan editor
+  setStep(4,'run','Menyiapkan editor…');await sleep(200);
+  setStep(4,'ok','Editor siap — klik elemen untuk mengedit');
+
+  // Update stats screen 3
+  document.getElementById('st-bab').textContent=h1c;
+  document.getElementById('st-sub').textContent=h2c;
+  document.getElementById('st-pg').textContent='~'+maxPg;
+  // Tampilkan panel referensi jika ada
+  if(S.parserInfo.referenceCount>0){
+    addAlert('ok',S.parserInfo.referenceCount+' referensi terdeteksi di Daftar Pustaka.');
+  }
+
+  document.getElementById('pbar').style.width='100%';
+  document.getElementById('proc-hl').textContent='Selesai ✓';
+  addAlert('ok','Dokumen siap. Klik "Edit & Unduh" untuk lanjut mengedit.');
+
+  const ab=document.querySelector('#screen-2 .panel');
+  if(!document.getElementById('btn-to-edit')){
+    const bar=document.createElement('div');
+    bar.className='abar';
+    bar.innerHTML='<button class="btn btn-ghost btn-sm" onclick="goScreen(1)">← Ulang</button><button class="btn btn-accent" id="btn-to-edit">Edit &amp; Unduh →</button>';
+    ab.appendChild(bar);
+    document.getElementById('btn-to-edit').addEventListener('click',()=>{renderEditor();goScreen(3);});
+  }
+});
+
+// ════════════════════════════════════
+// RENDER EDITOR (Screen 3)
+// ════════════════════════════════════
+function renderEditor(){
+  renderSegList();
+  renderDocPreview();
+}
+
+// ── Sidebar segment list ──
+function renderSegList(){
+  const list=document.getElementById('seg-list');
+  list.innerHTML='';
+  // Hanya tampilkan heading (h1/h2/h3) di sidebar navigasi
+  const headings=S.segments.filter(s=>['h1','h2','h3'].includes(s.type));
+  if(headings.length===0){
+    list.innerHTML='<div style="font-size:12px;color:var(--text3);font-family:sans-serif;text-align:center;padding:12px">Tidak ada heading.</div>';
+    return;
+  }
+  headings.forEach(s=>{
+    const el=document.createElement('div');
+    el.className='seg-item'+(s.id===activeSegId?' active':'');
+    el.dataset.id=s.id;
+    const ic=s.type==='h1'?'📌':s.type==='h2'?'📎':'🔹';
+    const label=s.num?(s.num+' '):'';
+    const typeLabel=s.type==='h1'?'BAB (H1)':s.type==='h2'?'Sub-bab (H2)':'Sub-sub-bab (H3)';
+    // Zone badge warna
+    const zoneBg=s.zone==='chapter'?'var(--accent-bg)':s.zone==='reference'?'var(--green-bg)':s.zone==='frontmatter'?'var(--amber-bg)':'var(--surface-2)';
+    const zoneColor=s.zone==='chapter'?'var(--accent)':s.zone==='reference'?'var(--green)':s.zone==='frontmatter'?'var(--amber)':'var(--text3)';
+    const zoneLabel=s.zone==='chapter'?'bab':s.zone==='reference'?'ref':s.zone==='frontmatter'?'front':s.zone||'';
+    el.innerHTML=`<span class="seg-ic">${ic}</span>
+      <div class="seg-info">
+        <div class="seg-name">${label}${s.text}</div>
+        <div class="seg-type" style="display:flex;align-items:center;gap:5px">
+          ${typeLabel}
+          <span style="font-size:9px;padding:1px 6px;border-radius:10px;background:${zoneBg};color:${zoneColor}">${zoneLabel}</span>
+        </div>
+      </div>
+      <button class="seg-del" data-id="${s.id}" title="Hapus">✕</button>`;
+    el.addEventListener('click',e=>{
+      if(e.target.classList.contains('seg-del'))return;
+      scrollToSeg(s.id);
+      activeSegId=s.id;
+      renderSegList();
+    });
+    el.querySelector('.seg-del').addEventListener('click',e=>{
+      e.stopPropagation();
+      deleteSeg(s.id);
+    });
+    list.appendChild(el);
+  });
+}
+
+function scrollToSeg(id){
+  const el=document.getElementById('el-'+id);
+  if(el){el.scrollIntoView({behavior:'smooth',block:'center'});highlightEl(el);}
+}
+function highlightEl(el){
+  el.classList.add('selected');
+  setTimeout(()=>el.classList.remove('selected'),1500);
+}
+
+// ── Main document preview ──
+function renderDocPreview(){
+  const prev=document.getElementById('doc-preview');
+  const numbered=applyNumbering(S.segments);
+  numbered.forEach(s=>{const orig=S.segments.find(x=>x.id===s.id);if(orig)orig.num=s.num;});
+  estimatePages(S.segments);
+
+  let html='';
+
+  // ── TOC — hanya dari zone chapter ──
+  const chapHeadings=S.segments.filter(s=>['h1','h2','h3'].includes(s.type)&&s.zone==='chapter');
+  if(chapHeadings.length>0){
+    html+='<div class="toc-wrap" id="toc-section">';
+    html+='<div class="toc-title-el">DAFTAR ISI</div>';
+    chapHeadings.forEach(s=>{
+      const cls='toc-row toc-h'+(s.type[1])+'-row';
+      const label=s.type==='h1'?(s.num+'   '+s.text.toUpperCase()):(s.num+' '+s.text);
+      const pg=s.pageNum||'–';
+      html+=`<div class="${cls}" data-id="${s.id}" id="toc-${s.id}">
+        <span class="toc-label">${label}</span>
+        <span class="toc-dots-line"></span>
+        <span class="toc-pg" data-id="${s.id}">${pg}</span>
+      </div>`;
+    });
+    html+='</div><hr class="section-divider">';
+  }
+
+  // ── Body — render semua segment dengan zone divider ──
+  let lastZone='';
+  S.segments.forEach(s=>{
+    if(s.zone!==lastZone&&lastZone!==''){
+      const zoneLabel=s.zone==='chapter'?'Isi Bab':s.zone==='reference'?'Daftar Pustaka':s.zone==='appendix'?'Lampiran':'Front Matter';
+      const bg=s.zone==='reference'?'var(--green-bg)':s.zone==='appendix'?'var(--amber-bg)':'var(--accent-bg)';
+      const col=s.zone==='reference'?'var(--green)':s.zone==='appendix'?'var(--amber)':'var(--accent)';
+      const bdr=s.zone==='reference'?'var(--green-b)':s.zone==='appendix'?'var(--amber-b)':'var(--accent-b)';
+      html+=`<div style="margin:16px 0 12px;padding:3px 10px;font-size:10px;font-family:sans-serif;border-radius:4px;background:${bg};color:${col};border:.5px solid ${bdr}">✦ ${zoneLabel}</div>`;
+    }
+    lastZone=s.zone;
+    if(s.type==='h1'){
+      const pg=s.pageNum?`<span class="pg-badge">hlm. ${s.pageNum}</span>`:'';
+      const display=s.zone==='chapter'?(s.num+'<br>'+s.text.toUpperCase()):s.text.toUpperCase();
+      html+=`<div class="doc-h1" id="el-${s.id}" data-id="${s.id}" data-type="h1">${display}${pg}</div>`;
+    } else if(s.type==='h2'){
+      const display=s.zone==='chapter'&&s.num?s.num+' '+s.text:s.text;
+      html+=`<div class="doc-h2" id="el-${s.id}" data-id="${s.id}" data-type="h2">${display}</div>`;
+    } else if(s.type==='h3'){
+      const display=s.zone==='chapter'&&s.num?s.num+' '+s.text:s.text;
+      html+=`<div class="doc-h3" id="el-${s.id}" data-id="${s.id}" data-type="h3">${display}</div>`;
+    } else {
+      html+=`<p class="doc-p" id="el-${s.id}" data-id="${s.id}" data-type="p">${s.text}</p>`;
+    }
+  });
+
+  prev.innerHTML=html;
+  attachPreviewEvents();
+}
+
+// ════════════════════════════════════
+// PREVIEW EVENTS — inline edit
+// ════════════════════════════════════
+let activeEditEl=null;
+
+function attachPreviewEvents(){
+  const prev=document.getElementById('doc-preview');
+
+  // ── Klik heading di body: tampilkan toolbar ──
+  prev.querySelectorAll('[data-id][data-type]').forEach(el=>{
+    el.addEventListener('click',e=>{
+      e.stopPropagation();
+      const id=el.dataset.id;
+      const type=el.dataset.type;
+      if(type==='p'){
+        startInlineEdit(el,id);
+        return;
+      }
+      // heading: tampilkan toolbar
+      selectEl(el,id);
+    });
+
+    // Double click → langsung edit teks
+    el.addEventListener('dblclick',e=>{
+      e.stopPropagation();
+      startInlineEdit(el,el.dataset.id);
+    });
+  });
+
+  // ── Klik nomor halaman di TOC: edit manual ──
+  prev.querySelectorAll('.toc-pg').forEach(pg=>{
+    pg.addEventListener('click',e=>{
+      e.stopPropagation();
+      editTocPage(pg);
+    });
+  });
+
+  // ── Klik outside → deselect ──
+  prev.addEventListener('click',()=>{
+    if(activeEditEl&&activeEditEl.contentEditable==='true') return;
+    deselectAll();
+    hideToolbar();
+  });
+  document.addEventListener('click',e=>{
+    if(!e.target.closest('#doc-preview')&&!e.target.closest('#float-toolbar')){
+      finishEdit();
+      deselectAll();
+      hideToolbar();
+    }
+  },{passive:true});
+}
+
+function selectEl(el,id){
+  deselectAll();
+  finishEdit();
+  activeSegId=id;
+  el.classList.add('selected');
+  const seg=S.segments.find(s=>s.id===id);
+  if(seg) showToolbar(el,seg);
+  renderSegList();
+}
+
+function deselectAll(){
+  document.querySelectorAll('.selected').forEach(e=>e.classList.remove('selected'));
+}
+
+// ── INLINE EDIT ──
+function startInlineEdit(el,id){
+  finishEdit();
+  deselectAll();
+  const seg=S.segments.find(s=>s.id===id);
+  if(!seg)return;
+  activeEditEl=el;
+  activeSegId=id;
+
+  // Simpan teks bersih
+  const type=seg.type;
+  let cleanText=seg.text;
+  el.textContent=cleanText;
+  el.contentEditable='true';
+  el.focus();
+  // Posisi kursor ke akhir
+  const range=document.createRange();
+  const sel=window.getSelection();
+  range.selectNodeContents(el);
+  range.collapse(false);
+  sel.removeAllRanges();
+  sel.addRange(range);
+
+  el.classList.add('selected');
+  if(['h1','h2','h3'].includes(type)) showToolbar(el,seg);
+
+  el.addEventListener('keydown',onEditKeydown);
+  el.addEventListener('blur',()=>setTimeout(()=>finishEdit(),150));
+}
+
+function onEditKeydown(e){
+  if(e.key==='Enter'){e.preventDefault();finishEdit();}
+  if(e.key==='Escape'){e.preventDefault();
+    // revert
+    if(activeEditEl){activeEditEl.contentEditable='false';activeEditEl=null;}
+    renderDocPreview();renderSegList();
+    hideToolbar();
+  }
+}
+
+function finishEdit(){
+  if(!activeEditEl)return;
+  const id=activeEditEl.dataset.id;
+  const seg=S.segments.find(s=>s.id===id);
+  if(seg){
+    const raw=activeEditEl.textContent.trim();
+    if(raw) seg.text=raw;
+  }
+  activeEditEl.contentEditable='false';
+  activeEditEl=null;
+  // Re-render untuk sync nomor dan TOC
+  renderDocPreview();
+  renderSegList();
+}
+
+// ── EDIT TOC PAGE ──
+function editTocPage(pgEl){
+  if(pgEl.querySelector('input'))return;
+  const id=pgEl.dataset.id;
+  const seg=S.segments.find(s=>s.id===id);
+  if(!seg)return;
+  const cur=seg.pageNum||'';
+  const inp=document.createElement('input');
+  inp.type='number';inp.min=1;inp.className='toc-pg-input';
+  inp.value=cur;inp.title='Edit nomor halaman';
+  pgEl.innerHTML='';
+  pgEl.appendChild(inp);
+  inp.focus();inp.select();
+  const save=()=>{
+    const v=parseInt(inp.value);
+    if(!isNaN(v)&&v>0) seg.pageNum=v;
+    renderDocPreview();renderSegList();
+  };
+  inp.addEventListener('keydown',e=>{if(e.key==='Enter')save();if(e.key==='Escape'){renderDocPreview();renderSegList();}});
+  inp.addEventListener('blur',save);
+  inp.addEventListener('click',e=>e.stopPropagation());
+}
+
+// ════════════════════════════════════
+// FLOATING TOOLBAR
+// ════════════════════════════════════
+const toolbar=document.getElementById('float-toolbar');
+
+function showToolbar(el,seg){
+  const rect=el.getBoundingClientRect();
+  toolbar.style.top=(rect.bottom+window.scrollY+6)+'px';
+  toolbar.style.left=Math.max(8,rect.left+window.scrollX)+'px';
+  toolbar.classList.add('visible');
+
+  // Update state tombol
+  document.getElementById('ft-bold').classList.toggle('active-fmt',seg.bold);
+  document.getElementById('ft-italic').classList.toggle('active-fmt',seg.italic);
+  document.getElementById('ft-upper').classList.toggle('active-fmt',seg.upper);
+  document.getElementById('ft-h1').classList.toggle('active-fmt',seg.type==='h1');
+  document.getElementById('ft-h2').classList.toggle('active-fmt',seg.type==='h2');
+  document.getElementById('ft-h3').classList.toggle('active-fmt',seg.type==='h3');
+  document.getElementById('ft-p').classList.toggle('active-fmt',seg.type==='p');
+}
+
+function hideToolbar(){toolbar.classList.remove('visible');}
+
+// Toolbar button handlers
+document.getElementById('ft-bold').addEventListener('click',()=>{applyFmt('bold');});
+document.getElementById('ft-italic').addEventListener('click',()=>{applyFmt('italic');});
+document.getElementById('ft-upper').addEventListener('click',()=>{applyFmt('upper');});
+document.getElementById('ft-h1').addEventListener('click',()=>{applyLevel('h1');});
+document.getElementById('ft-h2').addEventListener('click',()=>{applyLevel('h2');});
+document.getElementById('ft-h3').addEventListener('click',()=>{applyLevel('h3');});
+document.getElementById('ft-p').addEventListener('click',()=>{applyLevel('p');});
+document.getElementById('ft-del').addEventListener('click',()=>{
+  if(activeSegId){deleteSeg(activeSegId);hideToolbar();}
+});
+
+function applyFmt(prop){
+  if(!activeSegId)return;
+  const seg=S.segments.find(s=>s.id===activeSegId);
+  if(!seg)return;
+  seg[prop]=!seg[prop];
+  finishEdit();
+  renderDocPreview();renderSegList();
+  // Reshow toolbar
+  const el=document.getElementById('el-'+activeSegId);
+  if(el)showToolbar(el,seg);
+}
+
+function applyLevel(newType){
+  if(!activeSegId)return;
+  const seg=S.segments.find(s=>s.id===activeSegId);
+  if(!seg)return;
+  seg.type=newType;
+  seg.bold=['h1','h2','h3'].includes(newType);
+  seg.upper=newType==='h1';
+  finishEdit();
+  renderDocPreview();renderSegList();
+  const el=document.getElementById('el-'+activeSegId);
+  if(el)showToolbar(el,seg);
+}
+
+function deleteSeg(id){
+  if(!confirm('Hapus elemen ini?'))return;
+  S.segments=S.segments.filter(s=>s.id!==id);
+  if(activeSegId===id){activeSegId=null;hideToolbar();}
+  renderDocPreview();renderSegList();
+}
+
+// ════════════════════════════════════
+// TAMBAH HEADING BARU
+// ════════════════════════════════════
+document.getElementById('btn-add-seg').addEventListener('click',()=>{
+  const text=prompt('Teks heading baru:','Sub-bab Baru');
+  if(!text||!text.trim())return;
+  const level=prompt('Level heading (1=BAB, 2=Sub-bab, 3=Sub-sub-bab):','2');
+  const lv=parseInt(level);
+  if(![1,2,3].includes(lv)){alert('Level harus 1, 2, atau 3');return;}
+  const uid='seg-new-'+Date.now();
+  S.segments.push({
+    id:uid,type:'h'+lv,text:text.trim(),
+    bold:true,italic:false,upper:lv===1,pageNum:null,
+    zone:'chapter', // baru selalu masuk chapter
+  });
+  renderDocPreview();renderSegList();
+  setTimeout(()=>scrollToSeg(uid),100);
+});
+
+// ════════════════════════════════════
+// SYNC TOC BUTTON
+// ════════════════════════════════════
+document.getElementById('btn-regen').addEventListener('click',()=>{
+  S.segments=applyNumbering(S.segments);
+  estimatePages(S.segments);
+  renderDocPreview();renderSegList();
+  const d=document.createElement('div');
+  d.className='alert ok';d.style.marginTop='8px';
+  d.innerHTML='<span class="alert-ic">✓</span><span>TOC dan penomoran berhasil disinkronkan.</span>';
+  document.querySelector('#screen-3 .abar').after(d);
+  setTimeout(()=>d.remove(),2500);
+});
+
+// ════════════════════════════════════
+// GENERATE DOCX — zone-aware
+// Section 1 (romawi) : Cover + TOC
+// Section 2 (arab)   : Chapter body
+// Section 3 (arab)   : Daftar Pustaka (jika ada)
+// Section 4 (arab)   : Lampiran (jika ada)
+// ════════════════════════════════════
+async function buildDocx(){
+  const {
+    Document,Paragraph,TextRun,Packer,
+    AlignmentType,PageBreak,NumberFormat,
+    Footer,PageNumber,SectionType,TabStopType,LeaderType,
+    ImageRun
+  }=docx;
+
+  const m=MARGINS[S.institusi]||MARGINS.umum;
+  const CM=567;
+  const fontSz=parseInt(S.fontPt)*2;
+  const bodyFont='Times New Roman';
+  const lineSpacing=Math.round(parseFloat(S.spasi)*240);
+  const pm={
+    top:   Math.round(m.atas  *CM),
+    right: Math.round(m.kanan *CM),
+    bottom:Math.round(m.bawah *CM),
+    left:  Math.round(m.kiri  *CM),
+  };
+
+  function makeFooter(align){
+    return new Footer({children:[new Paragraph({
+      children:[new TextRun({children:[PageNumber.CURRENT],font:bodyFont,size:fontSz})],
+      alignment:align||AlignmentType.CENTER,
+    })]});
+  }
+
+  function P(runs,opts={}){
+    return new Paragraph({children:Array.isArray(runs)?runs:[runs],...opts});
+  }
+  function T(text,opts={}){
+    return new TextRun({text,font:bodyFont,size:fontSz,...opts});
+  }
+
+  // Helper: paragraf berisi logo 4x4 cm (96 DPI → 151px), center
+  function makeLogoParagraph(){
+    if(!S.logoBuffer) return null;
+    try{
+      const sizePx=151; // 4cm @ 96dpi
+      return P(new ImageRun({
+        data:S.logoBuffer,
+        transformation:{width:sizePx,height:sizePx},
+        type:S.logoType==='png'?'png':'jpg',
+      }),{alignment:AlignmentType.CENTER,spacing:{after:200}});
+    }catch(e){
+      console.warn('Logo gagal dirender:',e.message);
+      return null;
+    }
+  }
+
+  const numbered=applyNumbering(S.segments);
+
+  // ─────────────────────────────────────
+  // SECTION 1 — Prelim: Cover + TOC (romawi)
+  // ─────────────────────────────────────
+  const prelim=[];
+
+  // ── HALAMAN SAMPUL (selalu dirender, sesuai panduan UNARS) ──
+  // Layout: Logo → Judul (TNR 14pt, bold, uppercase, center)
+  //         → Jenis karya (TNR 14pt, bold, center)
+  //         → Nama + NIM (TNR 12pt, bold, uppercase)
+  //         → Prodi + Fakultas + Universitas + Tahun (TNR 12pt, bold, uppercase)
+
+  const coverJudul   = S.meta.judul   || '[JUDUL KARYA ILMIAH]';
+  const coverPenulis = S.meta.penulis || '[NAMA MAHASISWA]';
+  const coverNim     = S.meta.nim     || '[NIM]';
+  const coverTahun   = S.meta.tahun   || String(new Date().getFullYear());
+  const coverProdi   = S.meta.prodi   || '[PROGRAM STUDI]';
+  const coverFakultas= S.meta.fakultas|| '[FAKULTAS]';
+  const coverJenis   = (S.meta.jenis||S.jenis||'SKRIPSI').toUpperCase();
+  const fontSzJudul  = 28; // 14pt dalam half-points
+  const fontSzCover  = fontSz; // 12pt
+
+  // Ruang atas — logo institusi 4x4cm (jika diunggah), fallback teks nama universitas
+  const logoP1=makeLogoParagraph();
+  if(logoP1){
+    prelim.push(logoP1);
+  } else {
+    prelim.push(P(T('UNIVERSITAS ABDURACHMAN SALEH SITUBONDO',{bold:true,size:fontSzCover}),{alignment:AlignmentType.CENTER,spacing:{before:0,after:80}}));
+  }
+
+  // Judul (TNR 14pt, Bold, Uppercase, Center)
+  prelim.push(P(T(coverJudul.toUpperCase(),{bold:true,size:fontSzJudul}),{
+    alignment:AlignmentType.CENTER,
+    spacing:{before:1200,after:400},
+  }));
+
+  // Jenis karya (TNR 14pt, Bold, Center)
+  prelim.push(P(T(coverJenis,{bold:true,size:fontSzJudul}),{
+    alignment:AlignmentType.CENTER,
+    spacing:{before:0,after:1200},
+  }));
+
+  // Nama mahasiswa (TNR 12pt, Bold, Uppercase)
+  prelim.push(P(T(coverPenulis.toUpperCase(),{bold:true,size:fontSzCover}),{alignment:AlignmentType.CENTER}));
+  prelim.push(P(T('NIM. '+coverNim,{bold:true,size:fontSzCover}),{alignment:AlignmentType.CENTER,spacing:{after:1200}}));
+
+  // Prodi + Fakultas + Univ + Tahun (TNR 12pt, Bold, Uppercase)
+  prelim.push(P(T('PROGRAM STUDI '+coverProdi.toUpperCase(),{bold:true,size:fontSzCover}),{alignment:AlignmentType.CENTER}));
+  prelim.push(P(T('FAKULTAS '+coverFakultas.toUpperCase(),{bold:true,size:fontSzCover}),{alignment:AlignmentType.CENTER}));
+  prelim.push(P(T('UNIVERSITAS ABDURACHMAN SALEH SITUBONDO',{bold:true,size:fontSzCover}),{alignment:AlignmentType.CENTER}));
+  prelim.push(P(T('TAHUN '+coverTahun,{bold:true,size:fontSzCover}),{alignment:AlignmentType.CENTER}));
+
+  // Page break ke halaman berikutnya (halaman judul)
+  prelim.push(P(new PageBreak()));
+
+  // ── HALAMAN JUDUL ──
+  // Sama seperti sampul + kalimat pengajuan + gelar
+  const gelar = S.meta.gelar || '[GELAR]';
+  const logoP2=makeLogoParagraph();
+  if(logoP2) prelim.push(logoP2);
+  prelim.push(P(T(coverJudul.toUpperCase(),{bold:true,size:fontSzJudul}),{
+    alignment:AlignmentType.CENTER,spacing:{before:logoP2?200:600,after:300},
+  }));
+  prelim.push(P(T(
+    'Diajukan sebagai salah satu syarat untuk memperoleh Gelar '+gelar,
+    {size:fontSz-2}
+  ),{alignment:AlignmentType.CENTER,spacing:{after:60}}));
+  prelim.push(P(T(
+    'Pada Fakultas '+coverFakultas+' Universitas Abdurachman Saleh Situbondo',
+    {size:fontSz-2}
+  ),{alignment:AlignmentType.CENTER,spacing:{after:600}}));
+  prelim.push(P(T(coverPenulis.toUpperCase(),{bold:true,size:fontSzCover}),{alignment:AlignmentType.CENTER}));
+  prelim.push(P(T('NIM. '+coverNim,{bold:true,size:fontSzCover}),{alignment:AlignmentType.CENTER,spacing:{after:1200}}));
+  prelim.push(P(T('PROGRAM STUDI '+coverProdi.toUpperCase(),{bold:true,size:fontSzCover}),{alignment:AlignmentType.CENTER}));
+  prelim.push(P(T('FAKULTAS '+coverFakultas.toUpperCase(),{bold:true,size:fontSzCover}),{alignment:AlignmentType.CENTER}));
+  prelim.push(P(T('UNIVERSITAS ABDURACHMAN SALEH SITUBONDO',{bold:true,size:fontSzCover}),{alignment:AlignmentType.CENTER}));
+  prelim.push(P(T('TAHUN '+coverTahun,{bold:true,size:fontSzCover}),{alignment:AlignmentType.CENTER}));
+  prelim.push(P(new PageBreak()));
+
+  // ── HALAMAN PERNYATAAN ORISINALITAS ──
+  prelim.push(P(T('PERNYATAAN ORISINALITAS',{bold:true}),{alignment:AlignmentType.CENTER,spacing:{after:300}}));
+  const orisinilLines=[
+    'Saya yang bertanda tangan di bawah ini:',
+  ];
+  orisinilLines.forEach(l=>prelim.push(P(T(l),{spacing:{line:280,lineRule:'auto',after:80}})));
+
+  const orisData=[
+    ['Nama',coverPenulis],
+    ['NIM',coverNim],
+    ['Program Studi',coverProdi],
+    ['Fakultas',coverFakultas],
+    ['Universitas','Universitas Abdurachman Saleh Situbondo'],
+  ];
+  orisData.forEach(([k,v])=>{
+    prelim.push(new Paragraph({
+      children:[T(k,{}),T('\t: '+v,{})],
+      tabStops:[{type:TabStopType.LEFT,position:2200}],
+      spacing:{line:280,lineRule:'auto',after:40},
+    }));
+  });
+
+  prelim.push(P(T(''),{spacing:{after:120}}));
+  prelim.push(P(T(
+    'Dengan ini menyatakan bahwa karya tulis ilmiah yang berjudul "'+coverJudul+'" adalah hasil karya saya sendiri. '+
+    'Dalam proses penyusunan karya ini, saya telah menggunakan bantuan teknologi kecerdasan buatan (Artificial Intelligence/AI) sebagai alat pendukung'+
+    (S.meta.aiTools?(' ('+S.meta.aiTools+')'):'')+
+    '. Penggunaan teknologi tersebut dilakukan dengan tetap mematuhi etika akademik, tidak melakukan plagiarisme, '+
+    'serta memastikan bahwa seluruh isi karya telah diverifikasi, diedit, dan disesuaikan dengan pemahaman serta analisis pribadi saya.'
+  ),{alignment:AlignmentType.BOTH,spacing:{line:280,lineRule:'auto',after:160}}));
+
+  prelim.push(P(T('Saya juga menyatakan bahwa:'),{spacing:{after:80}}));
+  [
+    'Karya tulis ini sepenuhnya bebas dari plagiarisme, baik secara keseluruhan maupun sebagian.',
+    'Segala referensi dan sumber yang digunakan telah dicantumkan dengan jelas dan sesuai dengan kaidah penulisan ilmiah.',
+    'Penggunaan AI hanya bersifat sebagai alat bantu, seperti pengolahan data, penyusunan draf, atau penyempurnaan bahasa, tanpa menggantikan proses berpikir kritis, analisis, dan pengambilan keputusan yang sepenuhnya saya lakukan sendiri.',
+  ].forEach((l,i)=>{
+    prelim.push(P(T((i+1)+'. '+l),{indent:{left:360,hanging:360},alignment:AlignmentType.BOTH,spacing:{line:280,lineRule:'auto',after:80}}));
+  });
+
+  prelim.push(P(T(
+    'Apabila di kemudian hari ditemukan pelanggaran terhadap pernyataan ini, saya siap menerima konsekuensi sesuai dengan peraturan yang berlaku di Universitas Abdurachman Saleh Situbondo.'
+  ),{alignment:AlignmentType.BOTH,spacing:{line:280,lineRule:'auto',before:80,after:300}}));
+
+  const tglOris=S.meta.tglOrisinil||'……………………………';
+  prelim.push(P(T('Situbondo, '+tglOris),{alignment:AlignmentType.RIGHT,spacing:{after:60}}));
+  prelim.push(P(T('Yang membuat pernyataan,'),{alignment:AlignmentType.RIGHT,spacing:{after:1000}}));
+  prelim.push(P(T(coverPenulis),{alignment:AlignmentType.RIGHT,bold:true}));
+  prelim.push(P(T('NIM: '+coverNim),{alignment:AlignmentType.RIGHT}));
+  prelim.push(P(new PageBreak()));
+
+  // ── LEMBAR PERSETUJUAN SKRIPSI ──
+  prelim.push(P(T('LEMBAR PERSETUJUAN SKRIPSI',{bold:true}),{alignment:AlignmentType.CENTER,spacing:{after:300}}));
+  [
+    ['JUDUL SKRIPSI',coverJudul],
+    ['NAMA',coverPenulis],
+    ['NIM',coverNim],
+    ['PROGRAM STUDI',coverProdi],
+  ].forEach(([k,v])=>{
+    prelim.push(new Paragraph({
+      children:[T(k,{bold:true}),T('\t: '+v,{})],
+      tabStops:[{type:TabStopType.LEFT,position:2600}],
+      spacing:{line:280,lineRule:'auto',after:60},
+    }));
+  });
+
+  const tglSetuju=S.meta.tglSetuju||'……………………………';
+  prelim.push(P(T(''),{spacing:{after:200}}));
+  prelim.push(P(T('Situbondo, '+tglSetuju),{alignment:AlignmentType.CENTER,spacing:{after:60}}));
+  prelim.push(P(T('Menyetujui,'),{alignment:AlignmentType.CENTER,spacing:{after:400}}));
+
+  const pb1Nama=S.meta.pb1Nama||'……………………………';
+  const pb1Nidn=S.meta.pb1Nidn||'……………………';
+  const pb2Nama=S.meta.pb2Nama||'……………………………';
+  const pb2Nidn=S.meta.pb2Nidn||'……………………';
+  const kaprodiNama=S.meta.kaprodiNama||'……………………………';
+  const kaprodiNidn=S.meta.kaprodiNidn||'……………………';
+
+  prelim.push(P(T('Dosen Pembimbing Utama'),{alignment:AlignmentType.CENTER,spacing:{after:600}}));
+  prelim.push(P(T(pb1Nama,{bold:true}),{alignment:AlignmentType.CENTER}));
+  prelim.push(P(T('NIDN. '+pb1Nidn),{alignment:AlignmentType.CENTER,spacing:{after:400}}));
+
+  prelim.push(P(T('Menyetujui,'),{alignment:AlignmentType.CENTER,spacing:{after:60}}));
+  prelim.push(P(T('Dosen Pembimbing Anggota'),{alignment:AlignmentType.CENTER,spacing:{after:600}}));
+  prelim.push(P(T(pb2Nama,{bold:true}),{alignment:AlignmentType.CENTER}));
+  prelim.push(P(T('NIDN. '+pb2Nidn),{alignment:AlignmentType.CENTER,spacing:{after:400}}));
+
+  prelim.push(P(T('Mengetahui,'),{alignment:AlignmentType.CENTER,spacing:{after:60}}));
+  prelim.push(P(T('Ketua Program Studi,'),{alignment:AlignmentType.CENTER,spacing:{after:600}}));
+  prelim.push(P(T(kaprodiNama,{bold:true}),{alignment:AlignmentType.CENTER}));
+  prelim.push(P(T('NIDN. '+kaprodiNidn),{alignment:AlignmentType.CENTER}));
+  prelim.push(P(new PageBreak()));
+
+  // ── HALAMAN PENGESAHAN UJIAN SKRIPSI ──
+  prelim.push(P(T('PENGESAHAN UJIAN SKRIPSI',{bold:true}),{alignment:AlignmentType.CENTER,spacing:{after:300}}));
+  [
+    ['JUDUL SKRIPSI',coverJudul],
+    ['NAMA',coverPenulis],
+    ['NIM',coverNim],
+    ['PROGRAM STUDI',coverProdi],
+  ].forEach(([k,v])=>{
+    prelim.push(new Paragraph({
+      children:[T(k,{bold:true}),T('\t: '+v,{})],
+      tabStops:[{type:TabStopType.LEFT,position:2600}],
+      spacing:{line:280,lineRule:'auto',after:60},
+    }));
+  });
+
+  prelim.push(P(T(''),{spacing:{after:120}}));
+  prelim.push(P(T(
+    'Telah berhasil dipertahankan di hadapan Dewan Penguji dan diterima sebagai bagian persyaratan yang diperlukan untuk memperoleh Gelar '+gelar+
+    ' pada Program Studi '+coverProdi+', Fakultas '+coverFakultas+', Universitas Abdurachman Saleh Situbondo.'
+  ),{alignment:AlignmentType.BOTH,spacing:{line:280,lineRule:'auto',after:300}}));
+
+  prelim.push(P(T('Dewan Penguji',{bold:true}),{spacing:{after:200}}));
+
+  const penguji=[
+    ['1. Ketua Penguji',S.meta.pq1Nama,S.meta.pq1Nidn],
+    ['2. Anggota I',S.meta.pq2Nama,S.meta.pq2Nidn],
+    ['3. Anggota II',S.meta.pq3Nama,S.meta.pq3Nidn],
+  ];
+  penguji.forEach(([role,nama,nidn])=>{
+    prelim.push(P(T(role+' '+(nama||'[NAMA]')),{spacing:{after:20}}));
+    prelim.push(P(T('NIDN. '+(nidn||'……………………')),{spacing:{after:20}}));
+    prelim.push(P(T('( …………………………… )'),{indent:{left:720},spacing:{after:240}}));
+  });
+
+  const tglSidang=S.meta.tglSidang||'……………………………';
+  prelim.push(P(T('Ditetapkan di : Situbondo'),{spacing:{after:20,before:200}}));
+  prelim.push(P(T('Tanggal : '+tglSidang),{spacing:{after:300}}));
+
+  const dekanNama=S.meta.dekanNama||'……………………………';
+  const dekanNidn=S.meta.dekanNidn||'……………………';
+  prelim.push(P(T('Dekan Fakultas '+(coverFakultas!=='[FAKULTAS]'?coverFakultas:'……………')+','),{alignment:AlignmentType.CENTER,spacing:{after:600}}));
+  prelim.push(P(T(dekanNama,{bold:true}),{alignment:AlignmentType.CENTER}));
+  prelim.push(P(T('NIDN. '+dekanNidn),{alignment:AlignmentType.CENTER}));
+  prelim.push(P(new PageBreak()));
+
+  // TOC — hanya chapter headings
+  prelim.push(P(T('DAFTAR ISI',{bold:true}),{alignment:AlignmentType.CENTER,spacing:{after:240}}));
+
+  numbered
+    .filter(s=>['h1','h2','h3'].includes(s.type)&&s.zone==='chapter')
+    .forEach(s=>{
+      const indent=s.type==='h2'?720:s.type==='h3'?1440:0;
+      const label=s.type==='h1'
+        ?(s.num+'   '+s.text.toUpperCase())
+        :(s.num+' '+s.text);
+      const pg=s.pageNum||'';
+      prelim.push(new Paragraph({
+        children:[
+          T(label,{bold:s.type==='h1'}),
+          T('\t'+pg),
+        ],
+        indent:{left:indent},
+        tabStops:[{type:TabStopType.RIGHT,position:8640,leader:LeaderType.DOT}],
+      }));
+    });
+
+  // ─────────────────────────────────────
+  // SECTION 2 — Body chapter (arab mulai 1)
+  // ─────────────────────────────────────
+  const body=[];
+  numbered
+    .filter(s=>s.zone==='chapter')
+    .forEach(s=>{
+      if(s.type==='h1'){
+        body.push(
+          P(new PageBreak()),
+          P(T(s.num,{bold:true}),{alignment:AlignmentType.CENTER,spacing:{after:60}}),
+          P(T(s.text.toUpperCase(),{bold:true}),{alignment:AlignmentType.CENTER,spacing:{after:240,line:lineSpacing,lineRule:'auto'}}),
+        );
+      } else if(s.type==='h2'){
+        body.push(P(T(s.num+' '+s.text,{bold:true}),{spacing:{before:240,after:120,line:lineSpacing,lineRule:'auto'}}));
+      } else if(s.type==='h3'){
+        body.push(P(T(s.num+' '+s.text,{bold:s.bold,italics:s.italic}),{spacing:{before:200,after:100,line:lineSpacing,lineRule:'auto'}}));
+      } else if(s.type==='p'){
+        body.push(P(T(s.text,{bold:s.bold,italics:s.italic}),{
+          indent:{firstLine:720},alignment:AlignmentType.BOTH,
+          spacing:{line:lineSpacing,lineRule:'auto',after:0},
+        }));
+      }
+    });
+
+  // ─────────────────────────────────────
+  // SECTION 3 — Daftar Pustaka (arab, lanjut)
+  // ─────────────────────────────────────
+  const refSegs=numbered.filter(s=>s.zone==='reference');
+  const refChildren=[];
+  if(refSegs.length>0){
+    refChildren.push(P(new PageBreak()));
+    refSegs.forEach(s=>{
+      if(s.type==='h1'){
+        refChildren.push(P(T(s.text.toUpperCase(),{bold:true}),{alignment:AlignmentType.CENTER,spacing:{after:240}}));
+      } else {
+        // Referensi: hanging indent, spasi 1, tanpa indent baris pertama
+        refChildren.push(P(T(s.text),{
+          indent:{left:720,hanging:720},
+          spacing:{line:240,lineRule:'auto',after:120},
+        }));
+      }
+    });
+  }
+
+  // ─────────────────────────────────────
+  // SECTION 4 — Lampiran (arab, lanjut)
+  // ─────────────────────────────────────
+  const appSegs=numbered.filter(s=>s.zone==='appendix');
+  const appChildren=[];
+  if(appSegs.length>0){
+    appChildren.push(P(new PageBreak()));
+    appSegs.forEach(s=>{
+      if(s.type==='h1'){
+        appChildren.push(P(T(s.text.toUpperCase(),{bold:true}),{alignment:AlignmentType.CENTER,spacing:{after:240}}));
+      } else {
+        appChildren.push(P(T(s.text),{spacing:{line:lineSpacing,lineRule:'auto',after:120}}));
+      }
+    });
+  }
+
+  // ─────────────────────────────────────
+  // SUSUN DOCUMENT
+  // ─────────────────────────────────────
+  const sections=[
+    // Section 1: Prelim (romawi)
+    {
+      properties:{
+        page:{margin:pm,pageNumbers:{start:1,formatType:NumberFormat.LOWER_ROMAN}},
+        type:SectionType.NEXT_PAGE,
+      },
+      footers:{default:makeFooter(AlignmentType.CENTER)},
+      children:prelim,
+    },
+    // Section 2: Body (arab mulai 1)
+    {
+      properties:{
+        page:{margin:pm,pageNumbers:{start:1,formatType:NumberFormat.DECIMAL}},
+        type:SectionType.NEXT_PAGE,
+      },
+      footers:{default:makeFooter(AlignmentType.CENTER)},
+      children:body.length>0?body:[P(T(''))],
+    },
+  ];
+
+  // Section 3: Daftar Pustaka (arab, lanjut dari body)
+  if(refChildren.length>0){
+    sections.push({
+      properties:{
+        page:{margin:pm},
+        type:SectionType.CONTINUOUS,
+      },
+      footers:{default:makeFooter(AlignmentType.CENTER)},
+      children:refChildren,
+    });
+  }
+
+  // Section 4: Lampiran
+  if(appChildren.length>0){
+    sections.push({
+      properties:{
+        page:{margin:pm},
+        type:SectionType.CONTINUOUS,
+      },
+      footers:{default:makeFooter(AlignmentType.CENTER)},
+      children:appChildren,
+    });
+  }
+
+  const document=new Document({sections});
+  return Packer.toBlob(document);
+}
+
+// ════════════════════════════════════
+// DOWNLOAD HANDLERS
+// ════════════════════════════════════
+document.getElementById('btn-dl-docx').addEventListener('click',async()=>{
+  const btn=document.getElementById('btn-dl-docx');
+  btn.style.opacity='.5';btn.style.pointerEvents='none';
+  btn.querySelector('.dlcard-s').textContent='Generating…';
+  try{
+    finishEdit();
+    const blob=await buildDocx();
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url;a.download=(S.file?S.file.name.replace('.docx',''):'dokumen')+'_formatted_v3.docx';
+    a.click();URL.revokeObjectURL(url);
+    btn.querySelector('.dlcard-s').textContent='Selesai diunduh ✓';
+    setTimeout(()=>{btn.querySelector('.dlcard-s').textContent='Dengan page number';btn.style.opacity='';btn.style.pointerEvents='';},2000);
+  }catch(e){
+    alert('Gagal generate .docx: '+e.message);
+    btn.querySelector('.dlcard-s').textContent='Coba lagi';btn.style.opacity='';btn.style.pointerEvents='';
+  }
+});
+
+document.getElementById('btn-dl-pdf').addEventListener('click',()=>{
+  finishEdit();
+  const content=document.getElementById('doc-preview').innerHTML;
+  const win=window.open('','_blank');
+  win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Preview</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Times New Roman',serif;font-size:12pt;line-height:2;padding:2.54cm 3cm 2.54cm 4cm;color:#111;background:#fff}
+.toc-wrap{margin-bottom:28px}
+.toc-title-el{font-size:12pt;font-weight:bold;text-align:center;text-transform:uppercase;margin-bottom:14px}
+.toc-row{display:flex;align-items:baseline;gap:4px;padding:2px 0;font-size:12pt}
+.toc-label{flex:1}.toc-dots-line{flex:1;border-bottom:1px dotted #aaa;margin:0 5px;position:relative;top:-3px}
+.toc-pg{min-width:28px;text-align:right}.toc-h1-row{font-weight:bold;text-transform:uppercase;margin-top:6px}
+.toc-h2-row{padding-left:20px}.toc-h3-row{padding-left:40px}
+.doc-h1{font-size:12pt;font-weight:bold;text-align:center;text-transform:uppercase;margin:28px 0 10px;page-break-before:always}
+.doc-h1:first-of-type{page-break-before:avoid}
+.doc-h2{font-size:12pt;font-weight:bold;margin:14px 0 6px}
+.doc-h3{font-size:12pt;font-weight:bold;font-style:italic;margin:10px 0 5px}
+.doc-p{text-indent:1.27cm;margin:0;text-align:justify}
+.section-divider{border:none;border-top:.5px solid #ccc;margin:20px 0}
+.pg-badge{display:none}.toc-pg-input{display:none}
+@media print{.doc-h1{page-break-before:always}.doc-h1:first-of-type{page-break-before:avoid}}
+</style></head><body>${content}</body></html>`);
+  win.document.close();win.focus();
+  setTimeout(()=>win.print(),700);
+});
+
+// ════════════════════════════════════
+// RESTART
+// ════════════════════════════════════
+document.getElementById('btn-restart').addEventListener('click',()=>{
+  S.file=null;S.rawHtml='';S.segments=[];S.docxBlob=null;activeSegId=null;
+  S.parserInfo={frontMatterCount:0,referenceCount:0,appendixCount:0,chapterCount:0,detectedRefs:[]};
+  S.logoBuffer=null;S.logoType=null;
+  fileInput.value='';
+  document.getElementById('file-info').style.display='none';
+  document.getElementById('file-name-display').textContent='';
+  dropZone.querySelector('.uz-t').textContent='Klik atau seret file .docx ke sini';
+  dropZone.querySelector('.uz-ic').textContent='⬆';
+  btnProses.disabled=true;
+  document.getElementById('proc-alerts').innerHTML='';
+  document.getElementById('pbar').style.width='0%';
+  ['inp-judul','inp-penulis','inp-nim','inp-tahun','inp-prodi','inp-fakultas'].forEach(id=>{
+    const el=document.getElementById(id);if(el)el.value='';
+  });
+  logoInput.value='';
+  logoPreviewBox.innerHTML='<span style="font-size:18px;color:var(--text3)">🖼</span>';
+  logoUploadText.innerHTML='<strong>Klik untuk unggah logo</strong>PNG/JPG, akan dicetak 4×4 cm';
+  btnLogoRemove.style.display='none';
+  for(let i=0;i<5;i++)setStep(i,'wait','Menunggu…');
+  const nb=document.getElementById('btn-to-edit');if(nb)nb.closest('.abar').remove();
+  hideToolbar();
+  goScreen(1);
+});
+
+// ════════════════════════════════════
+// INIT
+// ════════════════════════════════════
+goScreen(1);
+</script>
+</body>
+</html>

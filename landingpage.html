@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkripFlow V.3 - Penyusun Skripsi Profesional</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@700&display=swap');
+        
+        body { font-family: 'Inter', system_ui, sans-serif; }
+        .heading-font { font-family: 'Playfair Display', sans-serif; }
+
+        .hero-bg {
+            background: linear-gradient(135deg, #1a56a0 0%, #0f3a6e 100%);
+        }
+
+        .card-hover {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .card-hover:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+        }
+    </style>
+    <script>
+        // Konfigurasi Tailwind untuk mengurangi warning
+        tailwind.config = {
+            content: [],
+            theme: {
+                extend: {}
+            }
+        }
+    </script>
+</head>
+<body class="bg-zinc-50 text-zinc-800">
+
+    <!-- NAVBAR -->
+    <nav class="bg-white border-b sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 bg-blue-600 rounded-xl flex items-center justify-center text-white font-bold text-xl">
+                    <i class="fa-solid fa-book"></i>
+                </div>
+                <div>
+                    <span class="text-2xl font-bold tracking-tight heading-font">SkripFlow</span>
+                    <span class="text-blue-600 font-semibold text-xl">V.3</span>
+                </div>
+            </div>
+            
+            <div class="hidden md:flex items-center gap-8 text-sm font-medium">
+                <a href="#fitur" class="hover:text-blue-600 transition">Fitur</a>
+                <a href="#cara-kerja" class="hover:text-blue-600 transition">Cara Kerja</a>
+                <a href="#aman" class="hover:text-blue-600 transition">Keamanan</a>
+            </div>
+            
+            <div>
+                <a href="/index.html" target="_blank"
+                   class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-2xl transition-all flex items-center gap-2">
+                    Buka Aplikasi
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <section class="hero-bg text-white py-24">
+        <div class="max-w-5xl mx-auto px-6 text-center">
+            <div class="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md px-5 py-2 rounded-3xl text-sm mb-6">
+                <div class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
+                Versi Terbaru • V.3
+            </div>
+            
+            <h1 class="text-6xl md:text-7xl font-bold heading-font leading-tight mb-6">
+                Skripsi rapi.<br>
+                <span class="text-blue-300">Hanya dalam hitungan menit.</span>
+            </h1>
+            
+            <p class="max-w-2xl mx-auto text-xl text-blue-100 mb-8">
+                Alat cerdas berbasis browser untuk memformat skripsi, tesis, dan disertasi 
+                sesuai panduan penulisan karya ilmiah perguruan tinggi.
+            </p>
+
+            <div class="inline-flex items-center gap-3 bg-white/10 backdrop-blur-md px-6 py-3 rounded-3xl mb-10 border border-white/20">
+                <i class="fa-solid fa-shield-halved text-emerald-400 text-xl"></i>
+                <span class="font-semibold text-emerald-300">
+                    Data Anda <span class="font-bold text-white">100% AMAN</span> — Tidak ada data yang dikirim ke server
+                </span>
+            </div>
+            
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+                <a href="/index.html" target="_blank"
+                   class="group px-10 py-4 bg-white text-blue-700 hover:bg-amber-50 font-semibold text-lg rounded-3xl flex items-center gap-3 transition-all">
+                    Mulai Sekarang
+                    <i class="fa-solid fa-arrow-right group-active:translate-x-1 transition"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- FITUR -->
+    <section id="fitur" class="py-24 bg-white">
+        <div class="max-w-6xl mx-auto px-6">
+            <div class="text-center mb-16">
+                <span class="px-4 py-1.5 bg-blue-100 text-blue-700 text-sm font-semibold rounded-3xl">FITUR LENGKAP</span>
+                <h2 class="text-4xl font-bold heading-font mt-4">Dirancang Khusus untuk Karya Ilmiah</h2>
+            </div>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="card-hover bg-white border border-zinc-100 rounded-3xl p-8">
+                    <div class="w-14 h-14 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center text-3xl mb-6">📤</div>
+                    <h3 class="font-semibold text-2xl mb-2">Upload .docx</h3>
+                    <p class="text-zinc-600">Mendukung file Microsoft Word dengan struktur Heading.</p>
+                </div>
+
+                <div class="card-hover bg-white border border-zinc-100 rounded-3xl p-8">
+                    <div class="w-14 h-14 bg-amber-100 text-amber-600 rounded-2xl flex items-center justify-center text-3xl mb-6">🔍</div>
+                    <h3 class="font-semibold text-2xl mb-2">Deteksi Otomatis</h3>
+                    <p class="text-zinc-600">Mendeteksi bab, sub-bab, pustaka, dan lampiran.</p>
+                </div>
+
+                <div class="card-hover bg-white border border-zinc-100 rounded-3xl p-8">
+                    <div class="w-14 h-14 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center text-3xl mb-6">🔢</div>
+                    <h3 class="font-semibold text-2xl mb-2">Penomoran & Halaman</h3>
+                    <p class="text-zinc-600">Penomoran BAB romawi + estimasi halaman.</p>
+                </div>
+
+                <div class="card-hover bg-white border border-zinc-100 rounded-3xl p-8">
+                    <div class="w-14 h-14 bg-violet-100 text-violet-600 rounded-2xl flex items-center justify-center text-3xl mb-6">✏️</div>
+                    <h3 class="font-semibold text-2xl mb-2">Editor Inline</h3>
+                    <p class="text-zinc-600">Edit langsung di preview dokumen.</p>
+                </div>
+
+                <div class="card-hover bg-white border border-zinc-100 rounded-3xl p-8">
+                    <div class="w-14 h-14 bg-rose-100 text-rose-600 rounded-2xl flex items-center justify-center text-3xl mb-6">📋</div>
+                    <h3 class="font-semibold text-2xl mb-2">Halaman Pendahuluan</h3>
+                    <p class="text-zinc-600">Sampul, orisinalitas, persetujuan & pengesahan.</p>
+                </div>
+
+                <div class="card-hover bg-white border border-zinc-100 rounded-3xl p-8">
+                    <div class="w-14 h-14 bg-teal-100 text-teal-600 rounded-2xl flex items-center justify-center text-3xl mb-6">📘</div>
+                    <h3 class="font-semibold text-2xl mb-2">Ekspor .docx</h3>
+                    <p class="text-zinc-600">File siap cetak dengan nomor halaman yang benar.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- KEAMANAN -->
+    <section id="aman" class="py-20 bg-emerald-50">
+        <div class="max-w-4xl mx-auto px-6 text-center">
+            <div class="inline-flex items-center justify-center w-16 h-16 bg-white rounded-2xl shadow mb-6">
+                <i class="fa-solid fa-lock text-4xl text-emerald-600"></i>
+            </div>
+            <h2 class="text-3xl font-bold mb-4">Data Anda Aman & Pribadi</h2>
+            <p class="text-xl text-zinc-700">
+                SkripFlow bekerja <strong>100% di browser Anda</strong>. Tidak ada data yang dikirim ke server.
+            </p>
+        </div>
+    </section>
+
+    <!-- CARA KERJA -->
+    <section id="cara-kerja" class="py-24 bg-white">
+        <div class="max-w-5xl mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold heading-font">Hanya 3 Langkah Saja</h2>
+            </div>
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="text-center">
+                    <div class="mx-auto w-20 h-20 bg-blue-100 text-blue-600 rounded-3xl flex items-center justify-center text-5xl mb-6 font-bold">1</div>
+                    <h4 class="font-semibold mb-2">Unggah File .docx</h4>
+                </div>
+                <div class="text-center">
+                    <div class="mx-auto w-20 h-20 bg-blue-100 text-blue-600 rounded-3xl flex items-center justify-center text-5xl mb-6 font-bold">2</div>
+                    <h4 class="font-semibold mb-2">Konfigurasi & Edit</h4>
+                </div>
+                <div class="text-center">
+                    <div class="mx-auto w-20 h-20 bg-blue-100 text-blue-600 rounded-3xl flex items-center justify-center text-5xl mb-6 font-bold">3</div>
+                    <h4 class="font-semibold mb-2">Unduh Hasil</h4>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FINAL CTA -->
+    <section class="py-28 bg-gradient-to-br from-blue-600 to-blue-800 text-white">
+        <div class="max-w-3xl mx-auto text-center px-6">
+            <h2 class="text-5xl heading-font font-bold mb-6 leading-tight">
+                Anda dididik menjadi sarjana,<br>
+                <span class="text-amber-300">bukan juru ketik.</span>
+            </h2>
+            <p class="text-2xl mb-10 text-blue-100">
+                Biarkan SkripFlow yang menyelesaikan formatnya.
+            </p>
+            
+            <a href="/index.html" target="_blank"
+               class="inline-flex items-center gap-4 bg-white text-blue-700 hover:bg-amber-50 transition-all px-12 py-6 rounded-3xl text-2xl font-semibold shadow-2xl">
+                Buka SkripFlow V.3
+                <span class="text-4xl">→</span>
+            </a>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="bg-zinc-900 text-zinc-400 py-12">
+        <div class="max-w-6xl mx-auto px-6 text-center">
+            <div class="text-sm">
+                Dibuat oleh <span class="font-semibold text-white">Dapur Ide Kreatif</span><br>
+                untuk Mahasiswa Indonesia
+            </div>
+            <div class="mt-6 text-xs opacity-60">
+                © 2026 SkripFlow — Membantu mahasiswa fokus pada isi, bukan formatting
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>
