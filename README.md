@@ -1,58 +1,69 @@
-# SkripFlow V.3
+# SkripFlow v3
 
-**Penyusun Skripsi, Tesis, dan Disertasi yang Rapi & Profesional**
+**Aplikasi Web untuk Memformat Karya Ilmiah (Skripsi, Tesis, Disertasi)**
 
-Alat berbasis web (offline) untuk memformat karya ilmiah sesuai standar perguruan tinggi Indonesia. Tinggal unggah file `.docx`, atur konfigurasi, edit inline, lalu unduh hasil yang sudah rapi.
-
+Alat offline yang membantu mahasiswa menyusun dokumen akademik sesuai standar penulisan karya ilmiah perguruan tinggi di Indonesia.
 
 ## ✨ Fitur Utama
 
-- **Upload & Deteksi Otomatis** — Mendeteksi Heading 1, 2, 3 dan struktur dokumen
-- **Penomoran BAB Romawi** otomatis
-- **Editor Inline** — Edit judul, sub-bab, dan nomor halaman TOC langsung di preview
-- **Halaman Pendahuluan Lengkap**
-  - Halaman Sampul
+- Deteksi otomatis struktur Heading (BAB, Sub-bab, Sub-sub-bab)
+- Penomoran BAB menggunakan angka Romawi otomatis
+- Editor inline (klik langsung di preview untuk mengedit)
+- Generate halaman pendahuluan lengkap:
+  - Cover
+  - Halaman Judul
   - Pernyataan Orisinalitas
   - Lembar Persetujuan
-  - Halaman Pengesahan Sidang
-- **Nomor Halaman yang Benar** — Romawi untuk prelim, Arab untuk isi
-- **Generate .docx** siap cetak
-- **100% Offline & Private** — Tidak ada data yang dikirim ke server
+  - Halaman Pengesahan
+  - Persetujuan Publikasi
+  - Kata Pengantar
+  - Persembahan
+  - Motto
+  - Abstrak & Abstract
+  - Daftar Isi, Daftar Tabel, Daftar Gambar, Daftar Lampiran
+- Nomor halaman yang benar (Romawi untuk bagian awal, Arab untuk isi)
+- Support upload logo institusi
+- 100% Offline — Tidak ada data yang dikirim ke server
 
 ## 🚀 Cara Penggunaan
 
-1. Buka `index.html` di browser
-2. Unggah file skripsi Anda (.docx)
-3. Isi data identitas, pembimbing, dan penguji
-4. Edit inline jika diperlukan
-5. Unduh hasil akhir dalam format `.docx`
+1. Buka `index.html` (Landing Page)
+2. Klik **"Buka Aplikasi"** atau langsung buka `skripflow.html`
+3. Unggah file `.docx` Anda
+4. Isi data institusi, identitas, pembimbing, dan penguji
+5. Edit jika perlu di mode preview
+6. Unduh file `.docx` yang sudah rapi
 
-## 🎯 Target Pengguna
+## 📌 Persyaratan
 
-- Mahasiswa S1, S2, dan S3
-- Dosen pembimbing yang ingin membantu mahasiswa
-- Siapa saja yang sedang menyusun karya ilmiah
+- Gunakan **Heading 1** untuk judul BAB
+- Gunakan **Heading 2** untuk sub-bab
+- Gunakan **Heading 3** untuk sub-sub-bab
+- File harus berformat `.docx`
 
-## 📌 Catatan Penting
+## 📁 Struktur File
 
-- Pastikan judul bab menggunakan **Heading 1**, sub-bab menggunakan **Heading 2**, dst. di Microsoft Word
-- Semua proses berjalan di browser Anda (tidak ada server)
-- Data Anda **100% aman** dan tidak disimpan di mana pun
+- `index.html` → Halaman Landing
+- `skripflow.html` → Aplikasi Utama
 
-## 💡 Dibuat Oleh
+## 💡 Catatan
 
-**Dapur Ide Kreatif** — Untuk Mahasiswa Indonesia 🇮🇩
+- Semua proses berjalan di browser (offline)
+- Nama perguruan tinggi dapat diubah sesuai kebutuhan
+- Privasi terjamin — tidak ada data yang disimpan atau dikirim
 
-## 📄 Lisensi
+## 👨‍💻 Dibuat Oleh
 
-Proyek ini dibuat untuk tujuan edukasi dan membantu mahasiswa. Silakan gunakan dan modifikasi sesuai kebutuhan.
+**Dapur Ide Kreatif**  
+Untuk Mahasiswa Indonesia 🇮🇩
 
 ---
 
-**Made with ❤️ for Indonesian Students**
+**Made with ❤️ untuk mempermudah penyusunan karya ilmiah**
 
 ---
 
 ### Kontribusi
 
-Pull request sangat dipersilakan! Jika Anda ingin menambahkan template kampus baru atau fitur lain, silakan buka issue terlebih dahulu.
+Pull request sangat dipersilakan!  
+Anda dapat menambahkan fitur baru, template kampus, atau perbaikan lainnya.
